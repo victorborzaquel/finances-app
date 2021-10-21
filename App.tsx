@@ -1,4 +1,4 @@
-import { StatusBar } from 'expo-status-bar';
+import { StatusBar } from 'react-native';
 import React from 'react';
 import { Providers } from './src/hooks/providers';
 import { Routes } from './src/routes';
@@ -23,7 +23,11 @@ export default function App() {
   }
   return (
     <Providers>
-      <StatusBar style="auto" />
+      <StatusBar
+        translucent 
+				backgroundColor="transparent" 
+				barStyle="light-content" 
+      />
       <Routes />
     </Providers>
   );

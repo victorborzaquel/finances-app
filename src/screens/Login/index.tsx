@@ -22,13 +22,22 @@ export function Login() {
   const [loading, setLoading] = useState(false);
 
   async function handleSignInWithGoogle() {
+    let isActive = true;
     try {
       setLoading(true);
       await signInWithGoogle();
     } catch (error: any) {
       Alert.alert('Ops', 'Não foi possivel entrar com a conta google.')
       console.log('Erro ao entrar com a conta google: ' + error.message)
-    } 
+    } finally {
+      if (isActive) {
+        setLoading(false);
+      }
+    }
+    
+    return ()=> {
+      isActive = false;
+    }
   }
   return (
     <Container>
