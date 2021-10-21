@@ -2,9 +2,8 @@ import React from 'react'
 import {Ionicons} from '@expo/vector-icons';
 import { Container } from './styles';
 import { IIcon } from '../../global/interfaces';
-import { getIconName } from '../../utils/getIconName';
-import { getColorName } from '../../utils/getIColorName';
 import { useTheme } from 'styled-components/native';
+import ColorsData from '../../data/ColorsData';
 
 export function UIIcon({
   icon_name, 
@@ -16,14 +15,14 @@ export function UIIcon({
   size?: number
 }) {
 	const theme = useTheme()
-
+  ColorsData
 	return (
     <Container
-      color={getColorName(color_name)}
+      color={ColorsData[color_name]}
       size={size}
     >
       <Ionicons
-        name={getIconName(icon_name)}
+        name={icon_name}
         size={size / 2}
         color={theme.colors.background}
       />

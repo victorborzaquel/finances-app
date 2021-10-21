@@ -1,11 +1,14 @@
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { FlatList, ScrollView, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useTheme } from 'styled-components/native';
 import { AvatarImage } from '../../components/AvatarImage';
 import { StatusBarBackground } from '../../components/StatusBarBackground';
 import { UIIcon } from '../../components/UIIcon';
+import AccountDefaultData from '../../data/AccountDefaultData';
+import CategoryDefaultData from '../../data/CategoryDefaultData';
 import { shadow } from '../../global/styles/shadow';
 import { useAuth } from '../../hooks/auth';
 import { useStyle } from '../../hooks/style';
@@ -64,7 +67,6 @@ export function Dashboard() {
     return !amountVisible && style.money.hide;
   }
 
-
   return (
     <Container>
       <StatusBarBackground color="main" />
@@ -118,9 +120,19 @@ export function Dashboard() {
             </BalanceButton>
           </TransactionsBalance>
         </AccountBalance>
-        <UIIcon icon_name="home" color_name="orange" />
+        
+        {/* <UIIcon icon_name="home" color_name="orange" /> */}
       </Content>
-
+      <FlatList
+          data={AccountDefaultData}
+          keyExtractor={item => item.id}
+          renderItem={({item, index}) => (
+            <View style={{flexDirection: 'row', padding: 5, alignItems: 'center'}}>
+              <UIIcon icon_name={item.icon_name} color_name={item.color_name} />
+              <TransactionAmount type="income" style={{paddingLeft: 10}}>{item.name}</TransactionAmount>
+            </View>
+          )}
+        />
     </Container>
   );
 }

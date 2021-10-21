@@ -7,7 +7,7 @@ import React, {
 } from 'react'
 import * as AuthSession from 'expo-auth-session';
 import { 
-  IAcount,
+  IAccount,
   ICategory,
   ICreditCard, 
   ICreditCardTransaction, 
@@ -18,6 +18,8 @@ import {
 } from '../../global/interfaces';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UUID from 'react-native-uuid'
+import UserDefaultData from '../../data/UserDefaultData';
+import CategoryDefaultData from '../../data/CategoryDefaultData';
 import AccountDefaultData from '../../data/AccountDefaultData';
 
 interface IAuthContext {
@@ -29,7 +31,7 @@ interface IAuthContext {
   creditCards: ICreditCard[];
   creditCardTransactions: ICreditCardTransaction[];
   categories: ICategory[];
-  accounts: IAcount[];
+  accounts: IAccount[];
   expensesLimit: IExpenseLimit[];
   authStorageLoaded: boolean;
 }
@@ -86,7 +88,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
   const [creditCards, setCreditCards] = useState<ICreditCard[]>([] as ICreditCard[]);
   const [creditCardTransactions, setCreditCardTransactions] = useState<ICreditCardTransaction[]>([] as ICreditCardTransaction[]);
   const [categories, setCategories] = useState<ICategory[]>([] as ICategory[]);
-  const [accounts, setAccounts] = useState<IAcount[]>([] as IAcount[]);
+  const [accounts, setAccounts] = useState<IAccount[]>([] as IAccount[]);
   const [expensesLimit, setExpensesLimit] = useState<IExpenseLimit[]>([] as IExpenseLimit[]);
 
   const [authStorageLoaded, setAuthStorageLoaded] = useState(false);
@@ -141,21 +143,28 @@ function AuthProvider({ children }: { children: ReactNode }) {
           };
           return createAccount(userFormatted);
         } 
+      } else {
+        setAuthStorageLoaded(true);
       }
     } catch (error: any) {
       throw new Error(error);
-    }
+    } 
   }
 
   async function createAccount(user: INewUser) {
     try {
       const newUser: IUser = {
         ...user,
-        ...AccountDefaultData,
+        ...UserDefaultData,
         created_at: new Date(),
         id: String(UUID.v4()),
       };
+      const userIdCategoryDefaultData: ICategory[] = CategoryDefaultData.map(category => ({...category, user_id: newUser.id}));
+      const userIdAccountDefaultData: IAccount[] = AccountDefaultData.map(account => ({...account, user_id: newUser.id}));
+
       await AsyncStorage.setItem(USER_KEY! + newUser.id, JSON.stringify(newUser));
+      await AsyncStorage.setItem(CATEGORIES_KEY! + newUser.id, JSON.stringify(userIdCategoryDefaultData));
+      await AsyncStorage.setItem(ACCOUNTS_KEY! + newUser.id, JSON.stringify(userIdAccountDefaultData));
       
       signIn(newUser.id);
     } catch (error: any) {

@@ -1,5 +1,30 @@
 const ColorsData = {
-  
+  blue: '#6BAEDF',
+  blue_light: '#4DE8E8',
+  blue_dark: '#208383',
+  green: '#7CF95D', 
+  green_light: '#AAFD84', 
+  green_dark: '#41BD22', 
+  yellow: '#FFD600', 
+  yellow_light: '#F0F26F', 
+  yellow_dark: '#C4C732', 
+  white: '#DCDCDC', 
+  black: '#262424', 
+  grey: '#C7C7C7' ,
+  grey_light: '#D6D6D6',
+  grey_dark: '#ADADAD',
+  orange: '#E8974D', 
+  orange_light: '#EAA97B', 
+  orange_dark: '#D1722C', 
+  purple: '#752CD1', 
+  purple_light: '#9058D9', 
+  purple_dark: '#7237BE', 
+  pink: '#EB73D8', 
+  pink_light: '#EF81DE', 
+  pink_dark: '#D427B9', 
+  red: '#DF3939', 
+  red_light: '#E76464', 
+  red_dark: '#C33232', 
 }
 
 export default ColorsData;

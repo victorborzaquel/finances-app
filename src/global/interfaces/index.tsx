@@ -1,8 +1,16 @@
+import ColorsData from '../../data/ColorsData';
+import IconData from '../../data/IconData';
+
+type ElementType<T extends ReadonlyArray<unknown>> = T extends ReadonlyArray<infer ElementType> ? ElementType : never;
+
+
 type TransactionType = 'income' | 'expense';
-type WalletType = 'checking' | 'wallet' | 'saving' | 'investment' | 'others';
+type AccountType = 'checking' | 'wallet' | 'saving' | 'investment' | 'bank' | 'others';
 type IconType = 'credit-card' | 'category' | 'wallet';
-type IconNameType = 'home';
-type ColorNameType = 'blue' | 'green' | 'yellow' | 'white' | 'black' | 'orange' | 'purple';
+type IconCategoryNameType = typeof IconData['category'][number];
+type IconAccountNameType = typeof IconData['account'][number];
+type IconInterfaceNameType = typeof IconData['interface'][number];
+type ColorNameType = keyof typeof ColorsData;
 
 type ThemeType = 'light' | 'dark' | 'auto';
 type LanguageType = 'pt-BR' | 'us';
@@ -43,8 +51,8 @@ interface ITransaction {
 interface ITransfer {
   id: string;
   user_id: IUser['id'];
-  account_origin_id: IAcount['id'];
-  account_destination_id: IAcount['id'];
+  account_origin_id: IAccount['id'];
+  account_destination_id: IAccount['id'];
   description: string;
   amount: number;
   note: string;
@@ -55,7 +63,7 @@ interface ITransfer {
 interface ICreditCard {
   id: string;
   user_id: IUser['id'];
-  icon_name: IIcon['icon_name'];
+  icon_name: IconAccountNameType;
   color_name: IColor['color_name'];
   name: string;
   limit: number;
@@ -73,49 +81,48 @@ interface ICreditCardTransaction {
 }
 
 interface ICategory {
-  id: string;
+  name: string;
   user_id: IUser['id'];
-  icon_name: IIcon['icon_name'];
+  icon_name: IconCategoryNameType;
   color_name: IColor['color_name'];
   type: TransactionType;
 }
 
-interface IAcount {
+interface IAccount {
   id: string;
   user_id: IUser['id'];
-  icon_name: IIcon['icon_name'];
+  icon_name: IconAccountNameType;
   color_name: IColor['color_name'];
   name: string;
-  type: WalletType;
+  type: AccountType;
 }
 
 interface IExpenseLimit {
   id: string;
   user_id: IUser['id'];
-  category_id: ICategory['id'];
+  category_name: ICategory['name'];
   amount: number;
 }
 
 // UI
 interface IColor {
   color_name: ColorNameType;
-  color: string;
 }
 
 interface IIcon {
-  icon_name: IconNameType;
+  icon_name: IconInterfaceNameType;
   color_name: ColorNameType;
-  type: IconType;
 }
 
 export {
+  ElementType,
   IUser,
   ITransaction,
   ITransfer,
   ICreditCard,
   ICreditCardTransaction,
   ICategory,
-  IAcount,
+  IAccount,
   IExpenseLimit,
   IColor,
   IIcon
