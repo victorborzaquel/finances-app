@@ -7,9 +7,9 @@ interface Props {
 }
 
 const UserDefaultData: Props = {
-  language: 'pt-BR',
+  language: 'auto',
   theme: 'auto',
-  currency: 'BRL',
+  currency: 'auto',
 }
 
 export default UserDefaultData;

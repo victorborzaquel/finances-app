@@ -18,9 +18,11 @@ export type RootDashboardRouteProps<Screen extends keyof RootDashboardParamList>
 export function DashboardRoutes() {
   const { Screen, Navigator } = createNativeStackNavigator<RootDashboardParamList>();
   return (
-    <Navigator screenOptions={{
-      headerShown: false
-    }}>
+    <Navigator 
+      initialRouteName='Dashboard'
+      screenOptions={{
+        headerShown: false
+      }}>
       <Screen
         name="Dashboard"
         component={Dashboard}

@@ -1,18 +1,18 @@
 import { Feather } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { FlatList, ScrollView, View } from 'react-native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useTheme } from 'styled-components/native';
 import { AvatarImage } from '../../components/AvatarImage';
 import { StatusBarBackground } from '../../components/StatusBarBackground';
-import { UIIcon } from '../../components/UIIcon';
-import AccountDefaultData from '../../data/AccountDefaultData';
-import CategoryDefaultData from '../../data/CategoryDefaultData';
 import { shadow } from '../../global/styles/shadow';
 import { useAuth } from '../../hooks/auth';
+import { useLocalization } from '../../hooks/localization';
 import { useStyle } from '../../hooks/style';
-import { RootDashboardNavigationProps } from '../../routes/DashboardRoutes';
+import { RootDashboardNavigationProps } from '../../routes/DashboardRoutes';4
+import  * as Localization from 'expo-localization';
+import { UIIcon } from '../../components/UIIcon';
+import { isSameMonth } from '../../utils/dateUtils'
 
 import {
   AccountBalance,
@@ -34,9 +34,11 @@ import {
   UserName,
   Wrapper
 } from './styles';
+import I18n from 'i18n-js';
 
 export function Dashboard() {
-  const { user } = useAuth();
+  const { user, transactions } = useAuth();
+  const { toCurrency } = useLocalization();
   const theme = useTheme();
   const style = useStyle();
   const navigation = useNavigation<RootDashboardNavigationProps<'Dashboard'>>();
@@ -67,6 +69,30 @@ export function Dashboard() {
     return !amountVisible && style.money.hide;
   }
 
+  function getBalance() {
+    return transactions.reduce((acc, curr) => {
+      if (!curr.confirmed) return acc
+
+      switch (curr.type) {
+        case 'expense' : return Number(acc) - Number(curr.amount)
+        case 'income' : return Number(acc) + Number(curr.amount)
+        default : return acc
+      }
+    }, 0)
+  }
+
+  const mothBalance = (() => transactions.reduce((acc, curr) => {
+      if (!curr.confirmed || !isSameMonth(curr.date, new Date())) return acc
+
+      const { expense, income } = acc
+
+      switch (curr.type) {
+        case 'income': return {expense, income: Number(income) + Number(curr.amount)}
+        case 'expense': return {income, expense: Number(expense) + Number(curr.amount)}
+        default: return acc
+      }
+  }, {expense: 0, income: 0}))()
+  
   return (
     <Container>
       <StatusBarBackground color="main" />
@@ -81,10 +107,10 @@ export function Dashboard() {
           </UserAvatar>
 
           <SettingButton style={shadow.two} onPress={handleSettingsPress}>
-            <Feather
-              name="settings"
-              color={theme.colors.background}
-              size={RFValue(24)}
+            <UIIcon
+              icon_interface="settings"
+              color="background"
+              size={24}
             />
           </SettingButton>
         </HeaderContent>
@@ -95,44 +121,29 @@ export function Dashboard() {
           <BalanceHeader>
             <Wrapper>
               <BalanceText>Total na sua conta</BalanceText>
-              <BalanceAmount style={hideAmount()}>R$ 3.000,00</BalanceAmount>
+              <BalanceAmount style={hideAmount()}>{toCurrency(getBalance())}</BalanceAmount>
             </Wrapper>
 
-            <IconEyeButton>
-            <Feather
-              name={amountVisible ? "eye" : "eye-off"} 
-              size={24} 
-              color={theme.colors.title} 
-              onPress={handleAmountVisible}
-            />
+            <IconEyeButton onPress={handleAmountVisible}>
+              <UIIcon icon_interface={amountVisible ? "eye" : "eye-off"} size={24}  />
             </IconEyeButton>
           </BalanceHeader>
 
           <TransactionsBalance>
             <BalanceButton>
               <BalanceText>Receitas</BalanceText>
-              <TransactionAmount type="income" style={hideAmount()}>R$ 5.000,00</TransactionAmount>
+              <TransactionAmount type="income" style={hideAmount()}>{toCurrency(mothBalance.income)}</TransactionAmount>
             </BalanceButton>
 
             <BalanceButton>
               <BalanceText>Despesas</BalanceText>
-              <TransactionAmount type="expense" style={hideAmount()}>R$ 2.000,00</TransactionAmount>
+              <TransactionAmount type="expense" style={hideAmount()}>{toCurrency(mothBalance.expense)}</TransactionAmount>
             </BalanceButton>
           </TransactionsBalance>
         </AccountBalance>
         
         {/* <UIIcon icon_name="home" color_name="orange" /> */}
       </Content>
-      <FlatList
-          data={AccountDefaultData}
-          keyExtractor={item => item.id}
-          renderItem={({item, index}) => (
-            <View style={{flexDirection: 'row', padding: 5, alignItems: 'center'}}>
-              <UIIcon icon_name={item.icon_name} color_name={item.color_name} />
-              <TransactionAmount type="income" style={{paddingLeft: 10}}>{item.name}</TransactionAmount>
-            </View>
-          )}
-        />
     </Container>
   );
 }

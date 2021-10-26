@@ -7,8 +7,8 @@ const AccountDefaultData: {
   name: IAccount['name'],
   type: IAccount['type'],
 }[] = [
-  {id: '1',icon_name: 'wallet',color_name: 'green_dark',name: 'wallet',type: 'wallet'},
-  {id: '2',icon_name: 'globe',color_name: 'blue',name: 'bank',type: 'bank'},
+  {id: '1',icon_name: 'wallet',color_name: 'green_dark',name: 'Wallet',type: 'wallet'},
+  {id: '2',icon_name: 'globe',color_name: 'blue',name: 'Bank',type: 'bank'},
 ]
 
 export default AccountDefaultData;

@@ -8,11 +8,12 @@ import {
 } from './styles';
 
 export function Settings() {
-  const {signOut} = useAuth();
+  const { signOut, cleanStorage } = useAuth();
   return (
     <Container>
       <GoBackButton color="title" />
       <Button title="Sair da conta" onPress={signOut} />
+      <Button title="Limpar Dados" onPress={cleanStorage} />
     </Container>
   );
 }

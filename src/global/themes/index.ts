@@ -33,7 +33,7 @@ export default {
 		main_dark: '#4953B8',
 		main_light: '#AFB4E4',
 		main_title: '#FFFFFF',
-		main_background: '#5965E0',
+		main_background: '#D3D7FD',
 		main_hover_title: '#FFFFFF',
 		main_hover_background: '#4953B8',
 

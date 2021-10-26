@@ -20,7 +20,7 @@ export function GoBackButton({color}: { color: keyof DefaultTheme['colors']}) {
       <Feather
         name="chevron-left"
         color={theme.colors[color]}
-        size={RFValue(24)}
+        size={RFValue(30)}
       />
     </Container>
   );
