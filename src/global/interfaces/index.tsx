@@ -29,6 +29,7 @@ interface IUser {
   email_verified?: boolean;
   google_id?: string;
 
+  money_hide?: boolean;
   language: LanguageType;
   theme: ThemeType;
   currency: CurrencyType;
@@ -38,7 +39,7 @@ interface IUser {
 
 interface ITransaction {
   id: string;
-  user_id: IUser['id'];
+  user_id?: IUser['id'];
   category_id: ICategory['id'];
   account_id: IAccount['id'];
   type: TransactionType;
@@ -52,11 +53,13 @@ interface ITransaction {
   repeat_period: number;
   note: string;
   favorite: boolean;
+
 }
 
 interface ITransfer {
   id: string;
-  user_id: IUser['id'];
+  user_id?: IUser['id'];
+  type: TransactionType;
   account_origin_id: IAccount['id'];
   account_destination_id: IAccount['id'];
   description: string;
@@ -68,7 +71,7 @@ interface ITransfer {
 
 interface ICreditCard {
   id: string;
-  user_id: IUser['id'];
+  user_id?: IUser['id'];
   icon_name: IconAccountNameType;
   color_name: IColor['color_name'];
   name: string;
@@ -77,7 +80,7 @@ interface ICreditCard {
 
 interface ICreditCardTransaction {
   id: string;
-  user_id: IUser['id'];
+  user_id?: IUser['id'];
   category_id: ICategory['id'];
   amount: number;
   date: Date;
@@ -90,7 +93,7 @@ interface ICreditCardTransaction {
 interface ICategory {
   id: string;
   name: string;
-  user_id: IUser['id'];
+  user_id?: IUser['id'];
   icon_name: IconCategoryNameType;
   color_name: IColor['color_name'];
   type: TransactionType;
@@ -98,7 +101,7 @@ interface ICategory {
 
 interface IAccount {
   id: string;
-  user_id: IUser['id'];
+  user_id?: IUser['id'];
   icon_name: IconAccountNameType;
   color_name: IColor['color_name'];
   name: string;
@@ -107,7 +110,7 @@ interface IAccount {
 
 interface IExpenseLimit {
   id: string;
-  user_id: IUser['id'];
+  user_id?: IUser['id'];
   category_id: ICategory['id'];
   amount: number;
 }
@@ -121,6 +124,23 @@ interface IIcon {
   icon_name: IconCategoryNameType | IconAccountNameType;
   color_name: ColorNameType;
 }
+
+interface IFilter {
+  date: Date;
+  transactionType?: TransactionType;
+  categoryId?: string;
+  accountId?: string;
+  transactionConfirmed?: boolean;
+}
+
+interface IUpdateFilter {
+  date?: Date;
+  transactionType?: TransactionType;
+  categoryId?: string;
+  accountId?: string;
+  transactionConfirmed?: boolean;
+}
+
 export {
   ButtonType,
   TransactionType,
@@ -138,5 +158,7 @@ export {
   IAccount,
   IExpenseLimit,
   IColor,
-  IIcon
+  IIcon,
+  IFilter,
+  IUpdateFilter
 }

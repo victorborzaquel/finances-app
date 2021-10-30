@@ -1,12 +1,15 @@
 import styled from "styled-components/native";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
+import { BorderlessButton } from "react-native-gesture-handler";
+import { RFValue } from "react-native-responsive-fontsize";
 
 export const Container = styled.View`
   flex-direction: row;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
+  height: ${RFValue(55) + getStatusBarHeight()}px;
   padding: ${({theme}) => theme.display.padding_app}px;
-  padding-top: ${({theme}) => theme.display.padding_app + getStatusBarHeight()}px;
+  padding-bottom: ${({theme}) => theme.display.padding_app / 1.5}px;
   background-color: ${({ theme }) => theme.colors.main};
 `;
 
@@ -16,10 +19,17 @@ export const Title = styled.Text`
   font-size: ${({ theme }) => theme.fonts.size.medium}px;
 `;
 
+export const IconButton = styled(BorderlessButton)`
+  margin-left: ${({ theme }) => theme.display.padding_app}px;
+  padding: 3px;
+  justify-content: center;
+  align-items: center;
+`;
+
 export const Icons = styled.View`
   flex-direction: row;
 `;
 
 export const Wrapper = styled.View`
-  padding-left: 20px;
+  padding-left: ${({theme}) => theme.display.padding_app}px;
 `;

@@ -1,44 +1,76 @@
-import React, { useEffect } from 'react';
-import  * as Localization from 'expo-localization';
+import React, { useState } from "react";
+import { Text, View, StyleSheet, TouchableOpacity } from "react-native";
+import DraggableFlatList, {
+  RenderItemParams,
+} from "react-native-draggable-flatlist";
 
-import {
-  Container
-} from './styles';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Button, View } from 'react-native';
-import { languages } from '../../global/language';
-import { useLocalization } from '../../hooks/localization';
-import { useAuth } from '../../hooks/auth';
+const NUM_ITEMS = 10;
+function getColor(i: number) {
+  const multiplier = 255 / (NUM_ITEMS - 1);
+  const colorVal = i * multiplier;
+  return `rgb(${colorVal}, ${Math.abs(128 - colorVal)}, ${255 - colorVal})`;
+}
 
+type Item = {
+  key: string;
+  label: string;
+  height: number;
+  width: number;
+  backgroundColor: string;
+};
 
-const { CURRENT_USER_ID_KEY } = process.env;
-const { USER_KEY } = process.env;
-const { TRANSACTIONS_KEY } = process.env;
-const { TRANSFERS_KEY } = process.env;
-const { CREDIT_CARDS_KEY } = process.env;
-const { CREDIT_CARDS_TRANSACTIONS_KEY } = process.env;
-const { CATEGORIES_KEY } = process.env;
-const { ACCOUNTS_KEY } = process.env;
-const { EXPENSES_LIMIT_KEY } = process.env;
+const initialData: Item[] = [...Array(NUM_ITEMS)].map((d, index) => {
+  const backgroundColor = getColor(index);
+  return {
+    key: `item-${index}`,
+    label: String(index) + "",
+    height: 100,
+    width: 60 + Math.random() * 40,
+    backgroundColor,
+  };
+});
 
 export function Test() {
-  const {toMath, toOperator} = useLocalization()
-  const {transactions } = useAuth()
-  async function view() {
-    // const userId = '551440f5-4045-455b-9262-a03fcca87deb'
-    console.log(transactions)
-    // console.log(toOperator('/'))
-    }
+  const [data, setData] = useState(initialData);
 
+  const renderItem = ({ item, drag, isActive }: RenderItemParams<Item>) => {
+    return (
 
-  useEffect(() => {
+        <TouchableOpacity
+          onLongPress={drag}
+          disabled={isActive}
+          style={[
+            styles.rowItem,
+            { backgroundColor: isActive ? "red" : item.backgroundColor },
+          ]}
+        >
+          <Text style={styles.text}>{item.label}</Text>
+        </TouchableOpacity>
 
-  },[])
+    );
+  };
 
   return (
-    <Container>
-      <View style={{height: 200}} />
-        <Button title="test" onPress={view} />
-    </Container>
+    <DraggableFlatList
+      data={data}
+      onDragEnd={({ data }) => setData(data)}
+      keyExtractor={(item) => item.key}
+      renderItem={renderItem}
+    />
   );
 }
+
+const styles = StyleSheet.create({
+  rowItem: {
+    height: 100,
+    width: 100,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  text: {
+    color: "white",
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+});

@@ -10,25 +10,38 @@ import {
 import { useLocalization } from '../../hooks/localization'
 import { isSameYear } from '../../utils/dateUtils'
 import { MonthModal } from '../MonthModal'
+import { ShadowBackground } from '../ShadowBackground'
 
-export function DateSelect({ date, setDate }: {
+export function DateSelect({ date, setDate, filter }: {
   date: Date;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
+  setDate: any;
+  filter?: boolean;
 }) {
   const [dateModalVisible, setDateModalVisible] = useState(false)
   const { toDate } = useLocalization()
 
+  function editDate(type: 'sub' | 'add') {
+    const action = type === 'sub' ? subMonths : addMonths
+    const newDate = filter ? {date: action(date, 1)} : action(date, 1)
+    setDate(newDate)
+  }
+
+  
   return (
+    <>
+    {dateModalVisible && <ShadowBackground/>}
+    
     <Container>
+      
       <Arrows>
-        <ChangeDateButton onPress={() => setDate(subMonths(date, 1))}>
+        <ChangeDateButton onPress={() => editDate('sub')}>
           <UIIcon
             icon_interface="chevron-left"
             size={40}
             color="main"
           />
         </ChangeDateButton>
-        <ChangeDateButton onPress={() => setDate(addMonths(date, 1))}>
+        <ChangeDateButton onPress={() => editDate('add')}>
           <UIIcon
             icon_interface="chevron-right"
             size={40}
@@ -46,7 +59,9 @@ export function DateSelect({ date, setDate }: {
         setVisible={setDateModalVisible}
         setDate={setDate}
         date={date}
+        filter={filter}
       />
     </Container>
+    </>
   );
 }

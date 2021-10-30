@@ -8,8 +8,10 @@ import {
   Container
 } from './styles';
 
-export function GoBackButton({color}: { color: keyof DefaultTheme['colors']}) {
-  const navigation = useNavigation();
+export function GoBackButton({color, navigation}: { 
+  color: keyof DefaultTheme['colors'];
+  navigation: any;
+}) {
   const theme = useTheme();
 
   function handlePress() {

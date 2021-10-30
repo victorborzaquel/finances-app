@@ -1,5 +1,8 @@
+import { DatePickerOptions } from '@react-native-community/datetimepicker';
+import { t } from 'i18n-js';
 import React, { useState } from 'react';
 import { TouchableWithoutFeedback } from 'react-native';
+import { IFilter } from '../../global/interfaces';
 import { useLocalization } from '../../hooks/localization';
 import { isSameMonth } from '../../utils/dateUtils';
 import { UIButton } from '../UIButton';
@@ -18,19 +21,23 @@ import {
   Year,
 } from './styles';
 
-export function MonthModal({visible, setVisible, setDate, date }: {
+export function MonthModal({visible, setVisible, setDate, date, filter }: {
   visible: boolean;
   setVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  setDate: React.Dispatch<React.SetStateAction<Date>>;
+  setDate(date: IFilter | Date): void;
   date: Date;
+  filter?: boolean;
 }) {
   const { toDate } = useLocalization()
 
-  const monthValue = [0, 1,2,3,4,5,6,7,8,9,10,11]
+  const monthValue = [0,1,2,3,4,5,6,7,8,9,10,11]
   const [year, setYear] = useState(new Date().getFullYear())
 
   function handleCloseModal(date?: Date) {
-    if (!!date) setDate(date)
+    if (!!date) {
+      const newDate = filter ? {date} : date
+      setDate(newDate)
+    }
     setVisible(false)
   }
 
@@ -78,12 +85,12 @@ export function MonthModal({visible, setVisible, setDate, date }: {
 
           <Buttons>
             <UIButton
-              title="Cancelar"
+              title={t('Cancel')}
               color="attention"
               onPress={() => handleCloseModal()}
             />
             <UIButton
-              title="Mês atual"
+              title={t('Current mother')}
               color="secondary"
               onPress={() => handleCloseModal(new Date())}
             />

@@ -24,9 +24,7 @@ export const GoBackButtonWrapper = styled.View`
   left: ${({ theme }) => theme.display.padding_app}px;
 `;
 
-export const AmountButton = styled.TouchableOpacity`
-  
-`;
+export const AmountButton = styled.TouchableOpacity``;
 
 export const Amount = styled.Text.attrs({
   adjustsFontSizeToFit: true,
@@ -54,6 +52,19 @@ export const Forms = styled.ScrollView.attrs({
 export const Form = styled.ScrollView`
   width: ${({ theme })=> theme.display.window_width}px;
   padding: 0 ${({ theme }) => theme.display.padding_app}px;
+`;
+
+export const TransferIndicator = styled.View`
+  align-items: center;
+  padding: ${({ theme }) => theme.display.padding_app / 2}px 0;
+  border-bottom-width: 1px;
+  border-bottom-color: ${({ theme }) => theme.colors.line};
+`;
+
+export const TransferText = styled.Text`
+  color: ${({ theme }) => theme.colors.title};
+  font-family: ${({ theme }) => theme.fonts.family.title};
+  font-size: ${({ theme }) => theme.fonts.size.medium}px;
 `;
 
 export const Footer = styled.View`

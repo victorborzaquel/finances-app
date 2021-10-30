@@ -13,9 +13,11 @@ import { RootDashboardNavigationProps } from '../../routes/DashboardRoutes';4
 import  * as Localization from 'expo-localization';
 import { UIIcon } from '../../components/UIIcon';
 import { isSameMonth } from '../../utils/dateUtils'
+import DraggableFlatList from 'react-native-draggable-flatlist'
 
 import {
   AccountBalance,
+  AvatarButton,
   BalanceAmount,
   BalanceButton,
   BalanceHeader,
@@ -34,116 +36,144 @@ import {
   UserName,
   Wrapper
 } from './styles';
-import I18n from 'i18n-js';
+import { t } from 'i18n-js'
+import { useData } from '../../hooks/data';
+import { RootSignInNavigationProps } from '../../routes/SignInRoutes';
+import { TransactionType } from '../../global/interfaces';
+import { UIButton } from '../../components/UIButton';
+import { Card } from '../../components/Card';
+import { PaidCard } from '../../components/PaidCard';
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
+import { AccountCard } from '../../components/AccountCard';
 
 export function Dashboard() {
-  const { user, transactions } = useAuth();
+  const { user, transactions, updateData, updateUser } = useAuth();
   const { toCurrency } = useLocalization();
-  const theme = useTheme();
-  const style = useStyle();
+  const [date, setDate] = useState(new Date())
+  
   const navigation = useNavigation<RootDashboardNavigationProps<'Dashboard'>>();
+  const navigationTab = useNavigation<RootSignInNavigationProps<'DashboardRoutes'>>();
 
   const [amountVisible, setAmountVisible] = useState(true);
+
+  const [cardVisible, setCardVisible] = useState([true]);
+  
+  const theme = useTheme();
+  const style = useStyle();
+  const {getBalance, filterTransactions, replaceFilter} = useData()
+
+  const balance = getBalance(new Date())
 
   function getGreetingTime() {
     const HourNow = new Date().getHours();
 
     if (HourNow >= 6 && HourNow < 12) {
-      return 'Bom dia';
+      return t('Good Morning');
     } else if (HourNow >= 12 && HourNow <= 18) {
-      return 'Boa tarde';
+      return t('Good afternoon');
     } else {
-      return 'boa noite';
+      return t('Good night');
     }
   }
 
-  function handleSettingsPress() {
+  function handleSettings() {
     navigation.navigate('Settings');
+  }
+  function handleUserDetails() {
+    navigation.navigate('UserDetails');
+  }
+
+  function handleEditHome() {
+    navigation.navigate('EditDashboard');
   }
 
   function handleAmountVisible() {
-    setAmountVisible(curr => !curr)
+    updateUser({...user, money_hide: !user.money_hide})
   }
 
   function hideAmount() {
-    return !amountVisible && style.money.hide;
+    return user.money_hide && style.money.hide;
   }
 
-  function getBalance() {
-    return transactions.reduce((acc, curr) => {
-      if (!curr.confirmed) return acc
+  function handleTransactions({transactionType, accountId}: {
+    transactionType?: TransactionType;
+    accountId?: string;
+  }) {
+    if (transactionType) replaceFilter({ date, transactionType })
+    if (accountId) replaceFilter({ date, accountId })
 
-      switch (curr.type) {
-        case 'expense' : return Number(acc) - Number(curr.amount)
-        case 'income' : return Number(acc) + Number(curr.amount)
-        default : return acc
-      }
-    }, 0)
+    navigationTab.navigate('TransactionsRoutes', { screen: 'Transaction' })
   }
 
-  const mothBalance = (() => transactions.reduce((acc, curr) => {
-      if (!curr.confirmed || !isSameMonth(curr.date, new Date())) return acc
-
-      const { expense, income } = acc
-
-      switch (curr.type) {
-        case 'income': return {expense, income: Number(income) + Number(curr.amount)}
-        case 'expense': return {income, expense: Number(expense) + Number(curr.amount)}
-        default: return acc
-      }
-  }, {expense: 0, income: 0}))()
-  
   return (
+    <>
+    <StatusBarBackground color="main" />
     <Container>
-      <StatusBarBackground color="main" />
+      
       <Header>
         <HeaderContent>
           <UserAvatar>
-            <AvatarImage />
+            <AvatarButton onPress={handleUserDetails}>
+              <AvatarImage />
+            </AvatarButton>
+            
             <Greetings>
               <GreetingText>{getGreetingTime()}</GreetingText>
               <UserName>{user.first_name}</UserName>
+              {/* <UserName>Date: Abril</UserName> */}
             </Greetings>
           </UserAvatar>
 
-          <SettingButton style={shadow.two} onPress={handleSettingsPress}>
+          {/* <SettingButton style={shadow.two} onPress={handleSettings}>
             <UIIcon
               icon_interface="settings"
               color="background"
               size={24}
             />
-          </SettingButton>
+          </SettingButton> */}
         </HeaderContent>
       </Header>
 
       <Content>
         <AccountBalance>
-          <BalanceHeader>
-            <Wrapper>
-              <BalanceText>Total na sua conta</BalanceText>
-              <BalanceAmount style={hideAmount()}>{toCurrency(getBalance())}</BalanceAmount>
-            </Wrapper>
+          <Card contentPadding>
+            <BalanceHeader>
+              <BalanceButton onPress={() => handleTransactions({})}>
+                <BalanceText>{t('Accounts balance')}</BalanceText>
+                <BalanceAmount style={hideAmount()}>{toCurrency(balance.income - balance.expense)}</BalanceAmount>
+              </BalanceButton>
 
-            <IconEyeButton onPress={handleAmountVisible}>
-              <UIIcon icon_interface={amountVisible ? "eye" : "eye-off"} size={24}  />
-            </IconEyeButton>
-          </BalanceHeader>
+              <IconEyeButton onPress={handleAmountVisible}>
+                <UIIcon icon_interface={amountVisible ? "eye" : "eye-off"} size={24}  />
+              </IconEyeButton>
+            </BalanceHeader>
 
-          <TransactionsBalance>
-            <BalanceButton>
-              <BalanceText>Receitas</BalanceText>
-              <TransactionAmount type="income" style={hideAmount()}>{toCurrency(mothBalance.income)}</TransactionAmount>
-            </BalanceButton>
+            <TransactionsBalance>
+              <BalanceButton enabled={!user.money_hide} onPress={() => handleTransactions({transactionType:'income'})}>
+                <BalanceText>{t('Incomes')}</BalanceText>
+                <TransactionAmount type="income" style={hideAmount()}>{toCurrency(balance.income)}</TransactionAmount>
+              </BalanceButton>
 
-            <BalanceButton>
-              <BalanceText>Despesas</BalanceText>
-              <TransactionAmount type="expense" style={hideAmount()}>{toCurrency(mothBalance.expense)}</TransactionAmount>
-            </BalanceButton>
-          </TransactionsBalance>
+              <BalanceButton enabled={!user.money_hide} onPress={() => handleTransactions({transactionType:'expense'})}>
+                <BalanceText>{t('Expenses')}</BalanceText>
+                <TransactionAmount type="expense" style={hideAmount()}>{toCurrency(balance.expense)}</TransactionAmount>
+              </BalanceButton>
+            </TransactionsBalance>
+          </Card>
         </AccountBalance>
+
+        <PaidCard type="expense" />
+        <PaidCard type="income" />
+        <AccountCard goTo={handleTransactions} />
         
-        {/* <UIIcon icon_name="home" color_name="orange" /> */}
+        {/* <UIButton
+          title="Editar página inicial"
+          color="main"
+          onPress={handleEditHome}
+        /> */}
       </Content>
     </Container>
+    </>
+    
   );
 }

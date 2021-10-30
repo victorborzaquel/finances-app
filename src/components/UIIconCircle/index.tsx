@@ -15,7 +15,7 @@ export function UIIconCircle({
 }: {
   icon_category?: IconCategoryNameType,
   icon_account?: IconAccountNameType,
-  color_name: IIcon['color_name'],
+  color_name?: IIcon['color_name'],
   size?: number
 }) {
 	const theme = useTheme()
@@ -26,7 +26,7 @@ export function UIIconCircle({
   }
 	return (
     <Container
-      color={ColorsData[color_name]}
+      color={ColorsData[color_name || 'black']}
       size={RFValue(size)}
     >
       <Ionicons

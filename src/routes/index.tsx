@@ -7,7 +7,7 @@ import { SignInRoutes } from './SignInRoutes';
 export function Routes() {
   const { user } = useAuth()
   return (
-    <NavigationContainer>
+    <NavigationContainer independent={true}>
       {!!user.id
         ? <SignInRoutes />
         : <SignOutRoutes />

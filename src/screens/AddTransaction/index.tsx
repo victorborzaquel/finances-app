@@ -1,6 +1,6 @@
 import { useIsFocused, useNavigation } from '@react-navigation/native'
 import React, { useEffect, useRef, useState } from 'react'
-import { ScrollView, NativeSyntheticEvent, NativeScrollEvent, Platform } from 'react-native'
+import { ScrollView, NativeSyntheticEvent, NativeScrollEvent, Platform, Alert } from 'react-native'
 import { useTheme } from 'styled-components/native'
 import { GoBackButton } from '../../components/GoBackButton'
 import { InputModal } from '../../components/InputModal'
@@ -23,11 +23,16 @@ import {
   Forms, 
   GoBackButtonWrapper, 
   Header,
+  TransferIndicator,
+  TransferText,
 } from './styles';
 import { CalculatorModal } from '../../components/CalculatorModal';
 import { CategoryModal } from '../../components/CategoryModal';
 import { AccountModal } from '../../components/AccountModal'
 import { otherCategory } from '../../data/CategoryDefaultData'
+import { ShadowBackground } from '../../components/ShadowBackground'
+import { UIIcon } from '../../components/UIIcon'
+import { t } from 'i18n-js'
 
 export function AddTransaction() {
   const [transactionType, setTransactionType] = useState<TransactionType>('expense')
@@ -37,18 +42,24 @@ export function AddTransaction() {
   const [amount, setAmount] = useState(0)
   const [category, setCategory] = useState({} as ICategory)
   const [account, setAccount] = useState({} as IAccount)
+
+  const [transferAccountOrigin, setTransferAccountOrigin] = useState({} as IAccount)
+  const [transferAccountDestination, setTransferAccountDestination] = useState({} as IAccount)
   
   const [dateModalVisible, setDateModalVisible] = useState(false)
   const [calculatorModalVisible, setCalculatorModalVisible] = useState(false)
   const [categoryModalVisible, setCategoryModalVisible] = useState(false)
   const [accountModalVisible, setAccountModalVisible] = useState(false)
+  const [transferAccountDestinationModalVisible, setTransferAccountDestinationModalVisible] = useState(false)
+  const [transferAccountOriginModalVisible, setTransferAccountOriginModalVisible] = useState(false)
 
   const scrollRef = useRef<ScrollView>()
   const { toCurrency, toDate } = useLocalization()
-  const { addData, defaultAccount, user } = useAuth()
+  const { addData, useDefaultAccount, user } = useAuth()
   const isFocused = useIsFocused()
   const navigation = useNavigation()
   const theme = useTheme()
+  const defaultAccount = useDefaultAccount()
   
   const transactionTypeScrollData: TransactionType[] = ['expense', 'income', 'transfer'];
 
@@ -89,16 +100,22 @@ export function AddTransaction() {
   }
 
   function handleCreateTransaction() {
+    if (transferAccountOrigin === transferAccountDestination && transactionType === 'transfer') {
+      return Alert.alert('Ops','As contas da transferencia não podem ser iguais!')
+    }
+    if (amount === 0) return Alert.alert('Ops','Você precisa colocar um valor!')
+
     if (transactionType === 'transfer') {
       addData('transfer', {
         id: String(UUID.v4()),
         user_id: user.id,
-        account_origin_id: '1',
-        account_destination_id: '2',
+        account_origin_id: transferAccountOrigin.id,
+        account_destination_id: transferAccountDestination.id,
+        type: transactionType,
         description,
         amount,
         note: '',
-        date: new Date(date),
+        date,
         recurring: false,
       })
     } else {
@@ -110,7 +127,7 @@ export function AddTransaction() {
         type: transactionType,
         amount,
         date,
-        description: description || (isCurrentCategoryType() && category.name) || otherCategory[transactionType].name,
+        description,
         confirmed: transactionConfirmed,
         recurring: false,
         repeat_quant: 1,
@@ -139,7 +156,7 @@ export function AddTransaction() {
     <Container>
       <Header color={setHeaderBackground()}>
         <GoBackButtonWrapper>
-          <GoBackButton color="background_secondary" />
+          <GoBackButton color="background_secondary" navigation={navigation} />
         </GoBackButtonWrapper>
 
         <AmountButton onPress={() => setCalculatorModalVisible(true)}>
@@ -148,19 +165,19 @@ export function AddTransaction() {
 
         <Buttons>
           <UIButton
-            title="Despesa" 
+            title={t('Expense')}
             press={transactionType === 'expense'} 
             color="attention" 
             onPress={()=> handleButtonTypePress('expense')}
           />
           <UIButton
-            title="Receita" 
+            title={t('Income')}
             press={transactionType === 'income'} 
             color="success" 
             onPress={()=> handleButtonTypePress('income')}
           />
           <UIButton
-            title="Transferencia" 
+            title={t('Transfer')}
             press={transactionType === 'transfer'} 
             color="secondary" 
             onPress={()=> handleButtonTypePress('transfer')}
@@ -174,7 +191,7 @@ export function AddTransaction() {
       >
         <Form>
           <InputToggle
-            title={transactionConfirmed ? 'Pago' : 'Não pago'} 
+            title={transactionConfirmed ? t('Paid') : t('Not paid')} 
             color="attention"
             state={transactionConfirmed}
             setState={setTransactionConfirmed}
@@ -196,7 +213,7 @@ export function AddTransaction() {
             icon="credit-card"
           />
           <InputText
-            title="Descrição"
+            title={t('Description')}
             state={description}
             setState={setDescription}
             icon="align-left"
@@ -205,7 +222,7 @@ export function AddTransaction() {
 
         <Form>
           <InputToggle
-            title={transactionConfirmed ? 'Recebido' : 'Não recebido'} 
+            title={transactionConfirmed ? t('Received') : t('Not received')} 
             color="success"
             state={transactionConfirmed}
             setState={setTransactionConfirmed}
@@ -227,7 +244,7 @@ export function AddTransaction() {
             icon="credit-card"
           />
           <InputText
-            title="Descrição"
+            title={t('Description')}
             state={description}
             setState={setDescription}
             icon="align-left"
@@ -235,20 +252,33 @@ export function AddTransaction() {
         </Form>
 
         <Form>
-          <InputToggle
-            title={transactionConfirmed ? 'Confirmado' : 'Não confirmado'} 
-            color="secondary"
-            state={transactionConfirmed}
-            setState={setTransactionConfirmed}
-            icon="check-square"
-          />
           <InputModal
-            title={date.toDateString()} 
+            title={toDate(date, 'allDate', true)} 
             setOpenModal={setDateModalVisible}
             icon="calendar"
           />
+          <InputModal
+            title={!!transferAccountOrigin.id ? transferAccountOrigin.name : t('Origin account')}
+            color={!!transferAccountOrigin.id ? undefined : 'text_details'}
+            setOpenModal={setTransferAccountOriginModalVisible}
+            icon="credit-card"
+          />
+          <TransferIndicator>
+            <TransferText>{t('Transfer to')}</TransferText>
+            <UIIcon
+              icon_interface='chevron-down'
+              color='title'
+              size={34}
+            />
+          </TransferIndicator>
+          <InputModal
+            title={!!transferAccountDestination.id ? transferAccountDestination.name : t('Destination account')}
+            color={!!transferAccountDestination.id ? undefined : 'text_details'}
+            setOpenModal={setTransferAccountDestinationModalVisible}
+            icon="credit-card"
+          />
           <InputText
-            title="Descrição"
+            title={t('Description')}
             state={description}
             setState={setDescription}
             icon="align-left"
@@ -258,13 +288,19 @@ export function AddTransaction() {
 
       <Footer>
         <UIButton
-          title="Confirmar"
-          press={!amount}
+          title={t('Confirm')}
           color="main"
           onPress={handleCreateTransaction}
         />
       </Footer>
-      
+
+      {(calculatorModalVisible || 
+        categoryModalVisible ||
+        accountModalVisible
+      ) && (
+        <ShadowBackground/>
+      )}
+
       <CalculatorModal
         visible={calculatorModalVisible}
         setVisible={setCalculatorModalVisible}
@@ -275,6 +311,18 @@ export function AddTransaction() {
         visible={accountModalVisible}
         setVisible={setAccountModalVisible}
         setAccount={setAccount}
+      />
+
+      <AccountModal
+        visible={transferAccountOriginModalVisible}
+        setVisible={setTransferAccountOriginModalVisible}
+        setAccount={setTransferAccountOrigin}
+      />
+
+      <AccountModal
+        visible={transferAccountDestinationModalVisible}
+        setVisible={setTransferAccountDestinationModalVisible}
+        setAccount={setTransferAccountDestination}
       />
 
       <CategoryModal
@@ -294,6 +342,7 @@ export function AddTransaction() {
           onChange={handleSelectDate}
         />
       )}
+      
     </Container>
   );
 }

@@ -1,4 +1,5 @@
 import { RectButton } from "react-native-gesture-handler";
+import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
 
@@ -8,26 +9,46 @@ export const Container = styled.View`
 
 export const Header = styled.View`
   align-items: center;
-  justify-content: flex-end;
   width: 100%;
-  height: 50%;
-  padding-bottom: 30px;
   padding: ${({ theme }) => theme.display.padding_app}px;
+  padding-top: ${({ theme }) => theme.display.button_height + getStatusBarHeight()}px;
+  background-color: ${({ theme }) => theme.colors.background};
+`;
+
+export const TitleWrapper = styled.View`
+  flex: 1;
+  justify-content: flex-end;
+`;
+
+export const Title = styled.Text`
+  color: ${({ theme }) => theme.colors.title};
+  font-family: ${({ theme }) => theme.fonts.family.title};
+  font-size: ${({ theme }) => theme.fonts.size.extra_largue}px;
+  padding: ${({ theme }) => theme.display.padding_app}px;
+  padding-bottom: ${({ theme }) => theme.display.button_height}px;
+`;
+
+export const Subtitle = styled.Text`
+  color: ${({ theme }) => theme.colors.background_secondary};
+  font-family: ${({ theme }) => theme.fonts.family.text};
+  font-size: ${({ theme }) => theme.fonts.size.medium}px;
+  padding-bottom:  ${({ theme }) => theme.display.button_height}px;
+  text-align: center;
 `;
 
 export const LogoTitle = styled.Text`
   color: ${({ theme }) => theme.colors.main};
   font-family: ${({ theme }) => theme.fonts.family.title};
-  font-size: ${({ theme }) => theme.fonts.size.extra_largue}px;
+  font-size: ${({ theme }) => theme.fonts.size.largue}px;
 `;
+
 
 export const Buttons = styled.View`
   background-color: ${({ theme }) => theme.colors.main};
   flex: 1;
   border-top-right-radius: 30px;
   border-top-left-radius: 30px;
-  padding: ${({ theme }) => theme.display.padding_app}px;
-  justify-content: center;
+  padding:  ${({ theme }) => theme.display.padding_app}px;
 `;
 
 export const Button = styled(RectButton)<{loading: boolean}>`

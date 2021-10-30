@@ -5,11 +5,12 @@ import {
   Container, Title
 } from './styles';
 
-export function UIButton({press=false, title, color, onPress, ...rest}: {
+export function UIButton({press=false, title='Button', color='main', onPress=() => {}, heightDivider = 1, ...rest}: {
   press?: boolean;
-  title: string;
-  color: ButtonType;
-  onPress: any;
+  title?: string;
+  color?: ButtonType;
+  heightDivider?: number;
+  onPress?: () => void;
 }) {
   return (
     <Container
@@ -17,6 +18,7 @@ export function UIButton({press=false, title, color, onPress, ...rest}: {
       color={color} 
       disabled={press} 
       onPress={onPress}
+      heightDivider={heightDivider}
       {...rest}
     >
       <Title

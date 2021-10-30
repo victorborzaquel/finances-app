@@ -1,5 +1,6 @@
 import { ICategory } from "../global/interfaces";
 import IconData from '../data/IconData'
+import { t } from 'i18n-js'
 
 interface Props {
   id: string;
@@ -28,7 +29,7 @@ const CategoryDefaultData: Props[] = [
   {id: '105', type: 'income', name: 'Salary', icon_name: 'cash', color_name: 'orange'},
   {id: '106', type: 'income', name: 'Business', icon_name: 'business', color_name: 'grey_dark'},
   {id: '107', type: 'income', name: 'Passive', icon_name: 'reload', color_name: 'pink'},
-  {id: '108', type: 'transfer', name: 'Extra', icon_name: 'add', color_name: 'purple'},
+  {id: '108', type: 'income', name: 'Extra', icon_name: 'add', color_name: 'purple'},
 ]
 export const otherCategory: {
   income: Props;
@@ -41,6 +42,13 @@ export const otherCategory: {
   transfer: {id: 'transferOthers', type: 'transfer', name: 'Others', icon_name: 'ellipsis-horizontal', color_name: 'black'},
   'credit-card': {id: 'creditCardOthers', type: 'credit-card', name: 'Others', icon_name: 'ellipsis-horizontal', color_name: 'black'},
 }
+
+export const othersCategories = [
+  otherCategory["credit-card"],
+  otherCategory.expense,
+  otherCategory.income,
+  otherCategory.transfer
+]
 
 
 export default CategoryDefaultData;

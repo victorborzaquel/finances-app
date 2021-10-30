@@ -14,7 +14,8 @@ import { format } from 'date-fns'
 import { isSameDay } from "../../utils/dateUtils"
 import { subDays, addDays } from 'date-fns'
 
-type Convert = (key: string | number) => string | number;
+type Convert = (key: string | number) => string;
+type ConvertNumber = (key: string | number) => string | number;
 type ToDate = (date: Date, type: ConvertDateType, today?: boolean) => string
 
 type IOperatorKey = keyof typeof languages.operators.us;
@@ -24,17 +25,20 @@ type ConvertDateType = keyof typeof languages.date.us.convert;
 const LocalizationContext = createContext({} as {
   toCurrency: Convert;
   toMath: Convert;
-  toOperator: Convert;
+  toOperator: ConvertNumber;
   toNumber: Convert;
   localizationLoaded: boolean;
   toDate: ToDate;
+  toPercentage(what: number, isFor: number, precision?: number): string;
 })
 
 function LocalizationProvider({children}: {children: ReactNode}) {
   const {user} = useAuth();
   const [language, setLanguage] = useState<LanguageType>('pt-BR');
   const [localizationLoaded, setLocalizationLoaded] = useState(false);
-  // I18n.translations = languages.dictionary;
+
+  I18n.locale = language;
+  I18n.translations = languages.dictionary;
   I18n.defaultLocale = 'us';
   I18n.fallbacks = true;
 
@@ -49,8 +53,11 @@ function LocalizationProvider({children}: {children: ReactNode}) {
   function toCurrency(amount: string | number) {
     return I18n.toCurrency(Number(amount), languages.currency[language])
   }
-  function toNumber (number: string | number) {
+  function toNumber(number: string | number) {
     return I18n.toNumber(Number(number), languages.number[language])
+  }
+  function toPercentage(what: number, isFor: number, precision=0) {
+    return I18n.toPercentage((what / isFor * 100), { precision })
   }
   function toOperator (operator: string | number) {
     const operatorName = operatorsKeys[operatorsValues.indexOf(String(operator))] as IOperatorKey
@@ -70,8 +77,8 @@ function LocalizationProvider({children}: {children: ReactNode}) {
       else if (isSameDay(date, subDays(new Date(), 1))) return languages.calendar[language].yesterday
       else if (isSameDay(date, addDays(new Date(), 1))) return languages.calendar[language].tomorrow
     }
-    
     const { convert, locale } = languages.date[language]
+    console.log(convert)
     return format(new Date(date), convert[type], { locale })
   }
 
@@ -113,7 +120,8 @@ function LocalizationProvider({children}: {children: ReactNode}) {
       toNumber,
       toOperator,
       toDate,
-      localizationLoaded
+      toPercentage,
+      localizationLoaded,
     }}>
       {children}
     </LocalizationContext.Provider>

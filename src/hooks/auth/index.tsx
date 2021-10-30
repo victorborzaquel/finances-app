@@ -19,8 +19,10 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import UUID from 'react-native-uuid'
 import UserDefaultData from '../../data/UserDefaultData';
-import CategoryDefaultData from '../../data/CategoryDefaultData';
+import CategoryDefaultData, { othersCategories } from '../../data/CategoryDefaultData';
 import AccountDefaultData from '../../data/AccountDefaultData';
+import { isSameMonth } from '../../utils/dateUtils';
+import { t } from 'i18n-js';
 
 interface AuthorizationResponse {
   params: {
@@ -78,12 +80,14 @@ const AuthContext = createContext({} as {
   creditCardTransactions: ICreditCardTransaction[];
   categories: ICategory[];
   accounts: IAccount[];
-  defaultAccount: IAccount;
   expensesLimit: IExpenseLimit[];
   authStorageLoaded: boolean;
   addData(type: UserDataType, newData: UserData): Promise<void>;
+  updateData(type: UserDataType, newData: UserData): Promise<void>;
   removeData(type: UserDataType, id: string): Promise<void>;
   cleanStorage(): Promise<void>;
+  useDefaultAccount(): IAccount;
+  updateUser(userUpdated: IUser): Promise<void>;
 });
 
 function AuthProvider({ children }: { children: ReactNode }) {
@@ -95,8 +99,6 @@ function AuthProvider({ children }: { children: ReactNode }) {
   const [categories, setCategories] = useState<ICategory[]>([] as ICategory[])
   const [accounts, setAccounts] = useState<IAccount[]>([] as IAccount[])
   const [expensesLimit, setExpensesLimit] = useState<IExpenseLimit[]>([] as IExpenseLimit[])
-
-  const [defaultAccount, setDefaultAccount] = useState({} as IAccount)
 
   const [authStorageLoaded, setAuthStorageLoaded] = useState(false);
 
@@ -141,11 +143,56 @@ function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  function useDefaultAccount() {
+    return accounts.find(account => account.id === user.default_account_id) as IAccount
+  }
+
+  async function updateUser(userUpdated: IUser) {
+    try {
+      const allUserStorage = await AsyncStorage.getItem(USER_KEY!) || '[]'
+      const allUsers = JSON.parse(allUserStorage) as IUser[]
+      const allUsersUpdated = allUsers.map(curr => curr.id !== user.id ? curr : userUpdated)
+      
+      await AsyncStorage.setItem(USER_KEY!, JSON.stringify(allUsersUpdated))
+      setUser(userUpdated)
+    } catch (error: any) {
+      throw new Error(error)
+    }
+  }
+
   async function addData(type: UserDataType, newData: UserData) {
     try {
       const { key, state, setState } = selectData(type)
       const updated = [...state, newData]
+      
+      setState(updated as any)
+      await AsyncStorage.setItem(key, JSON.stringify(updated))
+    } catch (error: any) {
+      throw new Error(error)
+    }
+  }
+  
+  async function removeData(
+    type: UserDataType, 
+    id: string
+    ) {
+      try {
+        const { key, state, setState } = selectData(type) as any
+        const updated = state.filter((curr: any) => curr.id !== id)
+        
+        setState(updated)
+        await AsyncStorage.setItem(key, JSON.stringify(updated))
+      } catch (error: any) {
+        throw new Error(error)
+      }
+    
+  }
 
+  async function updateData(type: UserDataType, newData: UserData) {
+    try {
+      const { key, state, setState } = selectData(type)
+      const updated = state.map(curr => curr.id !== newData.id ? curr : newData)
+      
       setState(updated as any)
       await AsyncStorage.setItem(key, JSON.stringify(updated))
     } catch (error: any) {
@@ -153,78 +200,57 @@ function AuthProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  async function removeData(
-    type: UserDataType, 
-    id: string
-  ) {
-    try {
-      const { key, state, setState } = selectData(type) as any
-      const updated = state.filter((curr: any) => curr.id !== id)
-
-      setState(updated)
-      await AsyncStorage.setItem(key, JSON.stringify(updated))
-    } catch (error: any) {
-      throw new Error(error)
-    }
-    
-  }
-
   async function signInWithGoogle() {
-    setAuthStorageLoaded(false)
-    try {
-      const RESPONSE_TYPE = 'token';
-      const SCOPE = encodeURI('profile email')
-      const URL = 'https://accounts.google.com/o/oauth2/v2/auth'
+      setAuthStorageLoaded(false)
+      try {
+        const RESPONSE_TYPE = 'token';
+        const SCOPE = encodeURI('profile email')
+        const URL = 'https://accounts.google.com/o/oauth2/v2/auth'
+        
+        const authUrl = (
+          URL +
+          `?client_id=${CLIENT_ID}` +
+          `&redirect_uri=${REDIRECT_URI}` +
+          `&response_type=${RESPONSE_TYPE}` +
+          `&scope=${SCOPE}`
+          );
+          
+        const { type, params } = await AuthSession.startAsync({ authUrl }) as AuthorizationResponse
+        
+        if (type !== 'success') throw new Error('Erro ao se conectar com conta Google!')
+        
+        const endpoint = `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${params.access_token}`
+        const response = await fetch(endpoint)
+        const userResponse: IUserGoogleResponse = await response.json()
+        const allUserStorage = await AsyncStorage.getItem(USER_KEY!)
+        
+        if (allUserStorage) {
+          const allUsers = JSON.parse(allUserStorage) as IUser[];
+          const userExist = allUsers.find(user => user.google_id === String(userResponse.id))
 
-      const authUrl = (
-        URL +
-        `?client_id=${CLIENT_ID}` +
-        `&redirect_uri=${REDIRECT_URI}` +
-        `&response_type=${RESPONSE_TYPE}` +
-        `&scope=${SCOPE}`
-      );
+          if (!!userExist) return signIn(userExist.id)
+        }
 
-      const { type, params } = await AuthSession.startAsync({ authUrl }) as AuthorizationResponse
-
-      if (type !== 'success') return setAuthStorageLoaded(true)
-
-      const endpoint = `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${params.access_token}`
-      const response = await fetch(endpoint)
-      const userResponse: IUserGoogleResponse = await response.json()
-      const allUserStorage = await AsyncStorage.getItem(USER_KEY!)
-
-      if (allUserStorage) {
-        const allUsers = JSON.parse(allUserStorage) as IUser[];
-        const userExist = allUsers.find(user => user.google_id === String(userResponse.id))
-
-        if (userExist) return signIn(userExist.id)
-        else return setAuthStorageLoaded(true)
-
-      } else {
-        const { 
-          id, 
-          email, 
-          verified_email, 
-          given_name, 
-          family_name, 
-          name, 
-          picture 
-        } = userResponse;
-        const userFormatted = {
-          google_id:      String(id),
-          email_verified: verified_email,
-          first_name:     given_name,
-          last_name:      family_name,
-          avatar:         picture,
-          email,
-          name,
-        };
-        return createAccount(userFormatted)
-      } 
+        return createAccount(formatUser('google', userResponse))
     } catch (error: any) {
       setAuthStorageLoaded(true)
       throw new Error(error)
     } 
+  }
+
+  function formatUser(type: 'google', user: IUserGoogleResponse) {
+    switch (type) {
+      case 'google': return ({
+        google_id: String(user.id),
+        email_verified: user.verified_email,
+        first_name: user.given_name,
+        last_name: user.family_name,
+        avatar: user.picture,
+        email: user.email,
+        name: user.name,
+      })
+      default: throw new Error('Invalid Type formatted User')
+    }
   }
 
   async function createAccount(user: INewUser) {
@@ -235,52 +261,81 @@ function AuthProvider({ children }: { children: ReactNode }) {
       id: String(UUID.v4()),
       default_account_id: '1'
     };
-    const userIdCategoryDefaultData: ICategory[] = CategoryDefaultData.map(category => ({...category, user_id: newUser.id}));
-    const userIdAccountDefaultData: IAccount[] = AccountDefaultData.map(account => ({...account, user_id: newUser.id}));
+    // const userIdCategoryDefaultData: ICategory[] = CategoryDefaultData.map(category => ({...category, user_id: newUser.id}));
+    // const userIdAccountDefaultData: IAccount[] = AccountDefaultData.map(account => ({...account, user_id: newUser.id})); 
 
     try {
-      await AsyncStorage.setItem(USER_KEY! + newUser.id, JSON.stringify(newUser));
-      await AsyncStorage.setItem(CATEGORIES_KEY! + newUser.id, JSON.stringify(userIdCategoryDefaultData));
-      await AsyncStorage.setItem(ACCOUNTS_KEY! + newUser.id, JSON.stringify(userIdAccountDefaultData));
+      const allUserStorage = await AsyncStorage.getItem(USER_KEY!) || '[]'
+
+      const allUsers = JSON.parse(allUserStorage) as IUser[]
+      allUsers.push(newUser)
+
+      await AsyncStorage.setItem(USER_KEY!, JSON.stringify(allUsers));
+      // await AsyncStorage.setItem(CATEGORIES_KEY! + newUser.id, JSON.stringify(userIdCategoryDefaultData));
+      // await AsyncStorage.setItem(ACCOUNTS_KEY! + newUser.id, JSON.stringify(userIdAccountDefaultData));
+
+      return signIn(newUser.id)
     } catch (error: any) {
       throw new Error(error)
-    } finally {
-      return signIn(newUser.id)
     }
   }
 
   async function signIn(userId: IUser['id']) {
-    setAuthStorageLoaded(false)
     try {
-      const userStorage = await AsyncStorage.getItem(USER_KEY! + userId)
+      const allUserStorage = await AsyncStorage.getItem(USER_KEY!) || '[]'
+      const allUsers = JSON.parse(allUserStorage) as IUser[]
+
+      const userStorage = allUsers.find(user => user.id === userId)
       
       if (userStorage) {
         const ALL_KEYS = await AsyncStorage.getAllKeys()
         const MY_KEYS = ALL_KEYS.filter(key => key.includes(userId))
         const MY_DATA = await AsyncStorage.multiGet(MY_KEYS)
 
+        const categoryFormatted = CategoryDefaultData.map(category => ({...category, name: t(category.name)}))
+        const othersCategoriesFormatted = othersCategories.map(category => ({...category, name: t(category.name)}))
+
+        const AccountDefaultDataFormatted = AccountDefaultData.map(category => ({...category, name: t(category.name)}))
+
+        setAccounts(AccountDefaultDataFormatted)
+        setCategories([...categoryFormatted, ...othersCategoriesFormatted])
+
         MY_DATA.forEach(data => {
           const key = data[0].split(':')[0] + ':'
           const set = JSON.parse(data[1] || '[]')
 
           switch (key) {
-            case USER_KEY:                      return setUser(set)
-            case TRANSACTIONS_KEY:              return setTransactions(set)
-            case TRANSFERS_KEY:                 return setTransfers(set)
-            case CREDIT_CARDS_KEY:              return setCreditCards(set)
-            case CREDIT_CARDS_TRANSACTIONS_KEY: return setCreditCardTransactions(set)
-            case CATEGORIES_KEY:                return setCategories(set)
-            case ACCOUNTS_KEY:                  return setAccounts(set)
-            case EXPENSES_LIMIT_KEY:            return setExpensesLimit(set)
-            default:                            return console.log('KEY NOT EXIST: ', key)
+            case TRANSACTIONS_KEY: 
+              setTransactions(set)
+              break
+            case TRANSFERS_KEY: 
+              setTransfers(set)
+              break
+            case CREDIT_CARDS_KEY: 
+              setCreditCards(set)
+              break
+            case CREDIT_CARDS_TRANSACTIONS_KEY: 
+              setCreditCardTransactions(set)
+              break
+            case ACCOUNTS_KEY: 
+              setAccounts(curr => [...curr, ...set])
+              break
+            case EXPENSES_LIMIT_KEY: 
+              setExpensesLimit(set)
+              break
+            case CATEGORIES_KEY:          
+              setCategories(curr => [...curr, ...set])
+              break
+            default: 
+              throw new Error('Key não existe')
           }
         })
-
+        
         await AsyncStorage.setItem(CURRENT_USER_ID_KEY!, userId)
+        setUser(userStorage)
       }
       return setAuthStorageLoaded(true)
     } catch (error: any) {
-      setAuthStorageLoaded(true)
       throw new Error(error)
     }
   }
@@ -297,13 +352,11 @@ function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (error) {
       await AsyncStorage.removeItem(CURRENT_USER_ID_KEY!)
-      console.log('loadUserStorageData: ' + error)
-      return setAuthStorageLoaded(true)
+      throw new Error('loadUserStorageData: ' + error)
     }
   }
 
   function clearData() {
-    setUser({} as IUser)
     setTransactions([] as ITransaction[])
     setTransfers([] as ITransfer[])
     setCreditCards([] as ICreditCard[])
@@ -311,35 +364,36 @@ function AuthProvider({ children }: { children: ReactNode }) {
     setCategories([] as ICategory[])
     setAccounts([] as IAccount[])
     setExpensesLimit([] as IExpenseLimit[])
+    setUser({} as IUser)
   }
 
   async function signOut() {
+    setAuthStorageLoaded(false)
     try {
-      await AsyncStorage.removeItem(CURRENT_USER_ID_KEY!)
       clearData()
+      await AsyncStorage.removeItem(CURRENT_USER_ID_KEY!)
     } catch (error: any) {
       throw new Error(error)
+    } finally {
+      setAuthStorageLoaded(true)
     }
   }
   
   async function cleanStorage() {
+    setAuthStorageLoaded(false)
     try {
       await AsyncStorage.clear()
       clearData()
     } catch (error: any) {
       throw new Error(error)
+    } finally {
+      setAuthStorageLoaded(true)
     }
   }
 
   useEffect(() => {
-    // cleanStorage()
     loadAuthStorageData()
-    // setAuthStorageLoaded(true)
-  }, [user.id])
-
-  useEffect(() => {
-    setDefaultAccount(accounts.find(account => account.id === user.default_account_id) as IAccount)
-  }, [user.default_account_id])
+  }, [])
 
   return (
     <AuthContext.Provider value={{
@@ -347,8 +401,10 @@ function AuthProvider({ children }: { children: ReactNode }) {
       signOut,
       user,
       transactions,
-      defaultAccount,
+      useDefaultAccount,
+      updateUser,
       addData,
+      updateData,
       removeData,
       transfers,
       creditCards,
@@ -357,7 +413,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
       accounts,
       expensesLimit,
       authStorageLoaded,
-      cleanStorage
+      cleanStorage,
     }}>
       {children}
     </AuthContext.Provider>

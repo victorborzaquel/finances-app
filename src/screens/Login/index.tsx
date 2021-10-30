@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
-import { Alert, StyleSheet, ActivityIndicator } from 'react-native';
-import { useTheme } from 'styled-components/native';
-import LogoSvg from '../../assets/logo.svg';
-import { useAuth } from '../../hooks/auth';
+import { t } from 'i18n-js'
+import React, { useState } from 'react'
+import { Alert, StyleSheet, ActivityIndicator } from 'react-native'
+import { useTheme } from 'styled-components/native'
+import LogoSvg from '../../assets/logo.svg'
+import { StatusBarBackground } from '../../components/StatusBarBackground'
+import { useAuth } from '../../hooks/auth'
 
 import {
   Button,
@@ -13,43 +15,63 @@ import {
   Container,
   Header,
   Loader,
-  LogoTitle
-} from './styles';
+  LogoTitle,
+  Subtitle,
+  Title,
+  TitleWrapper
+} from './styles'
 
 export function Login() {
-  const theme = useTheme();
-  const { signInWithGoogle } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const theme = useTheme()
+  const { signInWithGoogle } = useAuth()
+  const [loading, setLoading] = useState(false)
 
   async function handleSignInWithGoogle() {
-    let isActive = true;
+    let isActive = true
     try {
-      setLoading(true);
-      await signInWithGoogle();
+      setLoading(true)
+      return await signInWithGoogle()
     } catch (error: any) {
       Alert.alert('Ops', 'Não foi possivel entrar com a conta google.')
       console.log('Erro ao entrar com a conta google: ' + error.message)
     } finally {
       if (isActive) {
-        setLoading(false);
+        setLoading(false)
       }
     }
-    
-    return ()=> {
-      isActive = false;
+
+    return () => {
+      isActive = false
     }
   }
   return (
     <Container>
+      <StatusBarBackground color="main" />
       <Header>
-        <LogoSvg width={100} height={90} fill={theme.colors.main} />
+        <LogoSvg width={70} height={60} fill={theme.colors.main} />
         <LogoTitle>My Finances</LogoTitle>
       </Header>
 
+      <TitleWrapper>
+        <Title>
+          {
+            t('Take control') + '\n' +
+            t('of your finances')
+          }
+        </Title>
+      </TitleWrapper>
+
       <Buttons>
+        <Subtitle>
+          {
+            t('Login with your') + '\n' +
+            t('google account')
+          }
+        </Subtitle>
+
         <Button
           loading={loading}
-          style={styles.shadow} 
+          style={styles.shadow}
           onPress={handleSignInWithGoogle}
           enabled={!loading}
         >
@@ -57,18 +79,19 @@ export function Login() {
             <ButtonLogo source={require('../../assets/googleLogo.png')} />
           </ButtonLogoWrapper>
 
-          <ButtonTitle>Entrar com Google</ButtonTitle>
+          <ButtonTitle>{t('Login with Google')}</ButtonTitle>
 
           <Loader loading={loading}>
             <ActivityIndicator
-              size="small" 
-              color={theme.colors.main} 
+              size="small"
+              color={theme.colors.main}
             />
           </Loader>
         </Button>
       </Buttons>
+
     </Container>
-  );
+  )
 }
 
 const styles = StyleSheet.create({

@@ -3,7 +3,7 @@ import styled from "styled-components/native";
 
 export const Container = styled.View`
   width: 100%;
-  height: ${({ theme })=> theme.display.button_height}px;
+  height: ${({ theme })=> theme.display.button_height / 1.3}px;
   align-items: center;
   justify-content: center;
   background-color: ${({ theme }) => theme.colors.background_secondary};

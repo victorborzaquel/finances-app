@@ -3,7 +3,9 @@ import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
 
-export const Container = styled.View`
+export const Container = styled.ScrollView.attrs({
+  showsVerticalScrollIndicator: false
+})`
   flex: 1;
 `;
 
@@ -28,6 +30,12 @@ export const HeaderContent = styled.View`
 
 export const UserAvatar = styled.View`
   flex-direction: row;
+`;
+
+export const AvatarButton = styled.TouchableOpacity.attrs({
+  activeOpacity: 0.7
+})`
+  
 `;
 
 export const Greetings = styled.View`
@@ -60,14 +68,13 @@ export const SettingButton = styled(RectButton)`
 
 export const Content = styled.View`
   padding: 0 ${({ theme })=> theme.display.padding_app}px;
+  padding-bottom: ${RFValue(50)}px;
 `;
 
 export const AccountBalance = styled.View`
   width: 100%;
-  background-color: ${({ theme }) => theme.colors.background_secondary};
   margin-top: -${RFValue(70)}px;
-  padding: ${({ theme }) => theme.display.padding_app / 1.5}px;
-  border-radius: ${({ theme }) => theme.display.border_radius}px;
+  flex: 1;
 `;
 
 export const BalanceHeader = styled.View`
@@ -101,12 +108,11 @@ export const TransactionsBalance = styled.View`
   align-items: center;
 `;
 
-export const BalanceButton = styled(RectButton)`
-  /* padding: 10px 0; */
-`;
+export const BalanceButton = styled(RectButton)``;
 
 export const TransactionAmount = styled.Text<{type: 'income' | 'expense'}>`
   color: ${({ theme, type }) => type === 'income' ? theme.colors.success_dark : theme.colors.attention_dark};
   font-family: ${({ theme }) => theme.fonts.family.title};
   font-size: ${({ theme }) => theme.fonts.size.medium}px;
 `;
+

@@ -1,113 +1,198 @@
-import React, { useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { DateSelect } from '../../components/DateSelect'
 import { Header } from '../../components/Header'
 import { useAuth } from '../../hooks/auth'
+import { UIIconCircle } from '../../components/UIIconCircle'
+import { isSameDay, isSameMonth } from '../../utils/dateUtils'
+import { useLocalization } from '../../hooks/localization'
+import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
+import { useIsFocused, useNavigation } from '@react-navigation/native'
+import { RootTransactionsNavigationProps, RootTransactionsRouteProps } from '../../routes/TransactionsRoutes'
+import { useData } from '../../hooks/data'
+import { ITransaction, ITransfer, TransactionType } from '../../global/interfaces'
+import { FlatList } from 'react-native'
+import { UIAccountIcon } from '../../components/UIAccountIcon'
+import { UIIcon } from '../../components/UIIcon'
 
 import {
   AccountTitle,
   Amount,
+  BalanceButton,
   BalanceText,
-  BalanceWrapper,
   CategoryTitle,
-  Container, 
-  Description, 
-  Titles, 
-  Transaction, 
-  TransactionAmount, 
-  TransactionHeader, 
-  TransactionHeaderTitle, 
+  Container,
+  Description,
+  Titles,
+  Transaction,
+  TransactionAmount,
+  TransactionHeader,
+  TransactionHeaderTitle,
   TransactionList,
   TransactionsBalance,
-} from './styles';
-import { UIIconCircle } from '../../components/UIIconCircle'
-import { otherCategory } from '../../data/CategoryDefaultData'
-import { isSameMonth, isSameDay, isSameYear } from '../../utils/dateUtils'
-import { useLocalization } from '../../hooks/localization'
-import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
-import { TransactionEdit } from '../TransactionEdit';
-import { useNavigation } from '@react-navigation/native';
-import { RootTransactionsNavigationProps } from '../../routes/TransactionsRoutes';
+  Transfer,
+  TransferDescription,
+  TransferTitle,
+} from './styles'
+import { t } from 'i18n-js'
 
 export function Transactions() {
-  const [date, setDate] = useState(new Date())
-  
   const navigation = useNavigation<RootTransactionsNavigationProps<'Transaction'>>()
-  const { transactions, categories, accounts } = useAuth()
+
+  const { categories, accounts, transfers } = useAuth()
   const { toCurrency, toDate } = useLocalization()
+  const { getBalance, filterTransactions, filter, resetFilter, updateFilter } = useData()
+  const isFocused = useIsFocused()
 
-  const data = transactions
-    .filter(transaction => isSameMonth(transaction.date, date))
-    .sort((a, b) => new Date(a.date).getDate() - new Date(b.date).getDate())
+  const scrollRef = useRef<FlatList>()
 
-    const mothBalance = (() => transactions.reduce((acc, curr) => {
-      if (!curr.confirmed || !isSameMonth(curr.date, date)) return acc
+  const balance = getBalance(filter.date, true)
+  const data = filterTransactions()
 
-      const { expense, income } = acc
+  function handleEditTransaction(transactionId: ITransaction['id']) {
+    navigation.navigate('TransactionEdit', { transactionId })
+  }
 
-      switch (curr.type) {
-        case 'income': return {expense, income: Number(income) + Number(curr.amount)}
-        case 'expense': return {income, expense: Number(expense) + Number(curr.amount)}
-        default: return acc
-      }
-    }, {expense: 0, income: 0}))()
+  function handleEditTransfer(transferId: ITransfer['id']) {
+    navigation.navigate('TransferEdit', { transferId })
+  }
+
+  function handleBalanceButton(transactionType: TransactionType) {
+    updateFilter({ date: filter.date, transactionType })
+  }
+
+  function transfersBalance() {
+    return transfers
+      .filter(transfer => isSameMonth(transfer.date, filter.date))
+      .reduce((acc, curr) => Number(acc) + Number(curr.amount), 0)
+  }
+
+  function TransactionType({transaction}: {
+    transaction: ITransaction;
+  }) {
+    const category = categories.find(category => category.id === transaction.category_id)
+    return (
+      <Transaction confirmed={transaction.confirmed} onPress={() => handleEditTransaction(transaction.id)}>
+        <Description>
+          <UIIconCircle
+            icon_category={category?.icon_name}
+            color_name={category?.color_name}
+            size={40}
+          />
+          <Titles>
+            <CategoryTitle>{transaction.description || categories.find(category => category.id === transaction.category_id)?.name}</CategoryTitle>
+            <AccountTitle>{accounts.find(account => account.id === transaction.account_id)?.name}</AccountTitle>
+          </Titles>
+        </Description>
+        <Amount type={transaction.type}>{toCurrency(transaction.amount)}</Amount>
+      </Transaction>
+    )
+  }
+
+  function TransferType({transfer}: {
+    transfer: ITransfer;
+  }) {
+    const accountOrigin = accounts.find(account => account.id === transfer.account_origin_id)
+    const accountDestination = accounts.find(account => account.id === transfer.account_destination_id)
+    return (
+      <Transfer  onPress={() => handleEditTransfer(transfer.id)}>
+        <TransferDescription>
+          <TransferTitle>{transfer.description || 'Transferencia'}</TransferTitle>
+            <Description>
+            <UIAccountIcon account={accountOrigin} />
+            <UIIcon
+              icon_interface='chevron-right'
+            />
+          
+            <UIAccountIcon account={accountDestination} />
+          </Description>
+        </TransferDescription>
+        <Amount type={transfer.type}>{toCurrency(transfer.amount)}</Amount>
+      </Transfer>
+    )
+  }
+
+  useEffect(() => {
+    if (!isFocused) {
+      resetFilter()
+      scrollRef.current?.scrollToOffset({ animated: false, offset: 0 })
+    }
+  }, [isFocused])
 
   return (
     <Container space={useBottomTabBarHeight()}>
-      <Header title="Transações" />
+      <Header title={t('Transactions')} icons={[
+        {
+          iconName: 'refresh-cw', 
+          onPress: resetFilter,
+          hidden: Object.keys(filter).length === 1
+        },
+        {
+          iconName: 'filter',
+          color: Object.keys(filter).length === 1 ? 'background_secondary' : 'attention',
+          // onPress: () => setFilterModalVisible(true)
+        }
+      ]}/>
 
       <DateSelect
-        date={date}
-        setDate={setDate}
+        date={filter.date}
+        setDate={updateFilter}
+        filter
       />
 
       <TransactionsBalance>
-        <BalanceWrapper>
-          <BalanceText>Receitas</BalanceText>
-          <TransactionAmount type="income">{toCurrency(mothBalance.income)}</TransactionAmount>
-        </BalanceWrapper>
-        <BalanceWrapper>
-          <BalanceText>Despesas</BalanceText>
-          <TransactionAmount type="expense">{toCurrency(mothBalance.expense)}</TransactionAmount>
-        </BalanceWrapper>
+        <BalanceButton onPress={() => handleBalanceButton('income')} align='flex-start'>
+          <BalanceText>{t('Incomes')}</BalanceText>
+          <TransactionAmount type="income">{toCurrency(balance.income)}</TransactionAmount>
+        </BalanceButton>
+        <BalanceButton onPress={() => handleBalanceButton('expense')} align='center'>
+          <BalanceText>{t('Expenses')}</BalanceText>
+          <TransactionAmount type="expense">{toCurrency(balance.expense)}</TransactionAmount>
+        </BalanceButton>
+        <BalanceButton onPress={() => handleBalanceButton('transfer')} align='flex-end'>
+          <BalanceText>{t('Transfers')}</BalanceText>
+          <TransactionAmount type="transfer">{toCurrency(transfersBalance())}</TransactionAmount>
+        </BalanceButton>
       </TransactionsBalance>
 
       <TransactionList
         data={data}
         keyExtractor={transaction => transaction.id}
+        ref={scrollRef as any}
         contentContainerStyle={{
           paddingBottom: useBottomTabBarHeight(),
         }}
         renderItem={({ item, index }) => {
-          const category = categories.find(category => category.id === item.category_id)
+          
           return (
             <>
-            {(index === 0 || !isSameDay(item.date, data[index-1].date)) && (
-              <TransactionHeader>
-                <TransactionHeaderTitle>
-                  {toDate(item.date, 'shortDayOfWeek')}
-                </TransactionHeaderTitle>
-              </TransactionHeader>
-            )}
-            
-            <Transaction confirmed={item.confirmed} onPress={() => navigation.navigate('TransactionEdit', item)}>
-              <Description>
-                <UIIconCircle
-                  icon_category={!!category ? category.icon_name : otherCategory[item.type].icon_name}
-                  color_name={!!category ? category.color_name : otherCategory[item.type].color_name}
-                  size={40}
-                />
-                <Titles>
-                  <CategoryTitle>{item.description}</CategoryTitle>
-                  <AccountTitle>{accounts.find(account => account.id === item.account_id)?.name}</AccountTitle>
-                </Titles>
-              </Description>
+              {(index === 0 || !isSameDay(item.date, data[index - 1].date)) && (
+                <TransactionHeader>
+                  <TransactionHeaderTitle>
+                    {toDate(item.date, 'shortDayOfWeek')}
+                  </TransactionHeaderTitle>
+                </TransactionHeader>
+              )}
+
+                {item.type === 'transfer'
+                  ? <TransferType transfer={item as ITransfer} />
+                  : <TransactionType transaction={item as ITransaction} />
+                }
               
-              <Amount type={item.type}>{toCurrency(item.amount)}</Amount>
-            </Transaction>
             </>
-          )}}
+          )
+        }}
       />
 
+      {/* {(filterModalVisible
+      ) && (
+        <ShadowBackground/>
+      )}
+
+      <FilterModal
+        visible={filterModalVisible}
+        setVisible={setFilterModalVisible}
+        date={date}
+      /> */}
     </Container>
   );
 }

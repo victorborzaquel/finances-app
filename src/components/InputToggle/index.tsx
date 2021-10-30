@@ -10,9 +10,9 @@ import {
   Title
 } from './styles';
 
-export function InputToggle({ color, icon, title, state, setState }: {
+export function InputToggle({ color='main', icon, title, state, setState }: {
   title: string;
-  color: ButtonType; 
+  color?: ButtonType; 
   icon: IconInterfaceNameType;
   state: boolean;
   setState: React.Dispatch<React.SetStateAction<boolean>>;

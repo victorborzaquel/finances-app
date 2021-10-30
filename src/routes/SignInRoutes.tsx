@@ -5,7 +5,7 @@ import {
 import { 
   RouteProp, 
   NavigatorScreenParams, 
-  ParamListBase 
+  ParamListBase, 
 } from '@react-navigation/native';
 import { DashboardRoutes } from './DashboardRoutes';
 import { RootDashboardParamList } from './DashboardRoutes'
@@ -18,17 +18,20 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { StyleSheet } from 'react-native';
 import { getBottomSpace } from 'react-native-iphone-x-helper';
 import { TabBarIcon, TabBarIconNameType } from '../components/TabBarIcon';
-import { Transactions } from '../screens/Transactions';
 import { RootTransactionsParamList, TransactionsRoutes } from './TransactionsRoutes';
+import { Charts } from '../screens/Charts';
+import { Goals } from '../screens/Goals';
 
 export type RootSignInParamList = {
   DashboardRoutes: NavigatorScreenParams<RootDashboardParamList>;
   TransactionsRoutes: NavigatorScreenParams<RootTransactionsParamList>;
   AddTransaction: undefined;
+  Charts: undefined;
+  Goals: undefined;
 };
 
-export type RootDashboardNavigationProps<Screen extends keyof RootSignInParamList> = BottomTabNavigationProp<RootSignInParamList, Screen>;
-export type RootDashboardRouteProps<Screen extends keyof RootSignInParamList> = RouteProp<RootSignInParamList, Screen>;
+export type RootSignInNavigationProps<Screen extends keyof RootSignInParamList> = BottomTabNavigationProp<RootSignInParamList, Screen>;
+export type RootSignInRouteProps<Screen extends keyof RootSignInParamList> = RouteProp<RootSignInParamList, Screen>;
 
 export function SignInRoutes() {
   const {Screen,Navigator} = createBottomTabNavigator();
@@ -49,10 +52,11 @@ export function SignInRoutes() {
       initialRouteName='DashboardRoutes'
       screenOptions={({route}) => {
         const isTransaction = route.name === 'AddTransaction';
+
         return({
           headerShown: false,
           tabBarShowLabel: false,
-          tabBarStyle: styles.tabBarStyle,
+          // tabBarStyle: styles.tabBarStyle,
           tabBarActiveTintColor: 'main' as ThemeColorType,
           tabBarInactiveTintColor: 'line' as ThemeColorType,
           tabBarIcon: ({color, ...rest}: any) => (
@@ -78,6 +82,7 @@ export function SignInRoutes() {
       <Screen
         name="TransactionsRoutes" 
         component={TransactionsRoutes} 
+        options={{ tabBarStyle: {} }}
       />
       <Screen
         name="AddTransaction" 
@@ -86,11 +91,11 @@ export function SignInRoutes() {
       />
       <Screen
         name="Charts" 
-        component={Test} 
+        component={Charts} 
       />
       <Screen
         name="Goals" 
-        component={Test} 
+        component={Goals} 
       />
     </Navigator>
   )
@@ -113,23 +118,23 @@ const TabBarButton = styled(BorderlessButton)`
   flex: 1;
 `;
 
-const styles = StyleSheet.create({
-	tabBarStyle: {
-		position: 'absolute',
-		height: RFValue(65),
-		left: 10,
-		right: 10,
-		bottom: getBottomSpace() + 10,
-		borderRadius: 15,
-		backgroundColor: '#ffffff',
+// const styles = StyleSheet.create({
+// 	tabBarStyle: {
+// 		position: 'absolute',
+// 		height: RFValue(65),
+// 		left: 10,
+// 		right: 10,
+// 		bottom: getBottomSpace() + 10,
+// 		borderRadius: 15,
+// 		backgroundColor: '#ffffff',
 
-		shadowColor: '#7F5DF0',
-		shadowOffset: {
-			width: 0,
-			height: 10,
-		},
-		elevation: 5,
-		shadowRadius: 3.5,
-		shadowOpacity: 0.25,
-	},
-});
+// 		shadowColor: '#7F5DF0',
+// 		shadowOffset: {
+// 			width: 0,
+// 			height: 10,
+// 		},
+// 		elevation: 5,
+// 		shadowRadius: 3.5,
+// 		shadowOpacity: 0.25,
+// 	},
+// });

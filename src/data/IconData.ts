@@ -100,7 +100,12 @@ const IconData = {
     'align-left': 'align-left',
     'settings': 'settings',
     'folder': 'folder',
-    'credit-card': 'credit-card'
+    'credit-card': 'credit-card',
+    'trash': 'trash-2',
+    'plus': 'plus',
+    'filter': 'filter',
+    'refresh-cw': 'refresh-cw',
+    'chevron-down': 'chevron-down',
   }
 } as const
 
