@@ -6,7 +6,7 @@ import { ITransaction, ITransfer, TransactionType } from "../../global/interface
 
 export const Container = styled.View<{space: number}>`
   flex: 1;
-  /* padding-bottom: ${({ space }) => space + getBottomSpace()}px; */
+  background-color: ${({ theme }) => theme.colors.background};
 `;
 
 export const HeaderButton = styled(BorderlessButton)`

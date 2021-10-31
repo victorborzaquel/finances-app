@@ -1,6 +1,7 @@
 import { Feather } from '@expo/vector-icons';
 import React, { useState } from 'react';
 import { TouchableWithoutFeedback } from 'react-native';
+import { Modalize } from 'react-native-modalize';
 import { useLocalization } from '../../hooks/localization';
 import { UIButton } from '../UIButton';
 
@@ -10,25 +11,21 @@ import {
   ButtonTitle,
   ButtonWrapper,
   CalculatorButtons,
-  CloseModal,
   Container,
-  Content,
   Delete,
   Display,
-  Modal,
   Total
 } from './styles';
 
-export function CalculatorModal({visible, setVisible, setAmount}: {
-  visible: boolean;
-  setVisible: React.Dispatch<React.SetStateAction<boolean>>;
+export function Calculator({ setAmount, close }: {
   setAmount: React.Dispatch<React.SetStateAction<number>>;
+  close(): void | undefined;
 }) {
   const { toCurrency, toMath, toOperator } = useLocalization()
   const [math, setMath] = useState('')
   const [placeholder, setPlaceholder] = useState(false)
 
-  const buttons = ['7', '8', '9', '+', '4', '5', '6','-', '1', '2', '3', '*', '.', '0', '=', '/']
+  const buttons = ['7', '8', '9', '+', '4', '5', '6', '-', '1', '2', '3', '*', '.', '0', '=', '/']
 
   const numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
   const operators = ['+', '-', '*', '/']
@@ -40,7 +37,7 @@ export function CalculatorModal({visible, setVisible, setAmount}: {
   function handleCloseModal(type: 'cancel' | 'confirm') {
     if (type === 'confirm') setAmount(Number(calculeMath('=')))
     setMath('')
-    setVisible(false)
+    close()
   }
 
   function handleButtonPress(buttonPressed: string) {
@@ -61,13 +58,13 @@ export function CalculatorModal({visible, setVisible, setAmount}: {
 
     if (numbers.includes(buttonPressed)) {
       if (
-        lastInput > Number(lastInput).toFixed(1) || 
+        lastInput > Number(lastInput).toFixed(1) ||
         lastInput.length >= 7
       ) return math
 
       return math + buttonPressed
     }
-    
+
     if (operators.includes(buttonPressed)) {
       if (math === '' || operators.includes(lastInput)) return math
 
@@ -75,13 +72,13 @@ export function CalculatorModal({visible, setVisible, setAmount}: {
     }
 
     switch (buttonPressed) {
-      case dot: 
+      case dot:
         return lastInput.includes('.')
           ? math
           : math + buttonPressed
       case deleteLast: return math.slice(0, math.trimEnd().length - 1)
       case deleteAll: return ''
-      case equals: 
+      case equals:
         setPlaceholder(true)
         if (math === '') return '0'
         if (operators.includes(lastInput)) return eval(calculeMath(deleteLast)).toString()
@@ -93,53 +90,43 @@ export function CalculatorModal({visible, setVisible, setAmount}: {
 
   return (
     <Container>
-      <Modal visible={visible}>
-        {visible && (
-          <TouchableWithoutFeedback onPress={() => handleCloseModal('cancel')}>
-            <CloseModal />
-          </TouchableWithoutFeedback>
-        )}
+      <Display>
+        <Total>{getDisplayFormat()}</Total>
+        <Delete
+          onPress={() => handleButtonPress('DEL')}
+          onLongPress={() => handleButtonPress('AC')}
+        >
+          <Feather name="delete" size={30} />
+        </Delete>
+      </Display>
 
-        <Content>
-          <Display>
-            <Total>{getDisplayFormat()}</Total>
-            <Delete
-              onPress={() => handleButtonPress('DEL')} 
-              onLongPress={() => handleButtonPress('AC')}
-            >
-              <Feather name="delete" size={30} />
-              </Delete>
-          </Display>
+      <CalculatorButtons>
+        {buttons.map(button => (
+          <ButtonContainer
+            key={String(button)}
+            onPress={() => handleButtonPress(button)}
+          >
+            <ButtonWrapper>
+              <ButtonTitle>
+                {toOperator(button)}
+              </ButtonTitle>
+            </ButtonWrapper>
+          </ButtonContainer>
+        ))}
+      </CalculatorButtons>
 
-          <CalculatorButtons>
-            {buttons.map(button => (
-              <ButtonContainer
-                key={String(button)}
-                onPress={() => handleButtonPress(button)}
-              >
-                <ButtonWrapper>
-                  <ButtonTitle>
-                    {toOperator(button)}
-                  </ButtonTitle>
-                </ButtonWrapper>
-              </ButtonContainer>
-            ))}
-          </CalculatorButtons>
-
-          <Buttons>
-            <UIButton
-              onPress={() => handleCloseModal('cancel')}
-              title="Cancelar"
-              color="attention"
-            />
-            <UIButton
-              onPress={() => handleCloseModal('confirm')}
-              title="Confirmar"
-              color="success"
-            />
-          </Buttons>
-        </Content>
-      </Modal>
+      <Buttons>
+        <UIButton
+          onPress={() => handleCloseModal('cancel')}
+          title="Cancelar"
+          color="attention"
+        />
+        <UIButton
+          onPress={() => handleCloseModal('confirm')}
+          title="Confirmar"
+          color="success"
+        />
+      </Buttons>
     </Container>
   );
 }

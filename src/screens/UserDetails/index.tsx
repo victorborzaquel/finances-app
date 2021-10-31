@@ -1,52 +1,26 @@
-import React, { useState } from 'react';
-import { Button } from 'react-native';
-import { GoBackButton } from '../../components/GoBackButton';
+import React, { useEffect } from 'react';
 import { useAuth } from '../../hooks/auth';
-import { useNavigation } from '@react-navigation/native'
+import { useIsFocused, useNavigation } from '@react-navigation/native'
 
 import {
   Buttons,
   Container, Content, GoBackHeader, GoBackTitle, UserName
 } from './styles';
-import { InputToggle } from '../../components/InputToggle';
 import { UIButton } from '../../components/UIButton';
-import { ListModal } from '../../components/ListModal';
-import { InputModal } from '../../components/InputModal';
-import { AccountModal } from '../../components/AccountModal';
-import { IAccount } from '../../global/interfaces';
-import * as Localization from 'expo-localization';
-import { Header } from '../../components/Header';
-import { UIIcon } from '../../components/UIIcon';
-import { UIAccountIcon } from '../../components/UIAccountIcon';
 import { AvatarImage } from '../../components/AvatarImage';
 import { t } from 'i18n-js';
+import { UIIcon } from '../../components/UIIcon';
+import { Header } from '../../components/Header';
 
 export function UserDetails() {
-  const { signOut, cleanStorage, user, accounts } = useAuth()
+  const { signOut, cleanStorage, user } = useAuth()
   const navigation = useNavigation()
 
-  const [darkMode, setDarkMode] = useState(false)
-  const [language, setLanguage] = useState('')
-  const [currency, setCurrency] = useState('')
-  const [account, setAccount] = useState({} as IAccount)
+  const isFocused = useIsFocused()
 
-  const [languageModalVisible, setLanguageModalVisible] = useState(false)
-  const [accountModalVisible, setAccountModalVisible] = useState(false)
-  const [currencyModalVisible, setCurrencyModalVisible] = useState(false)
-
-  const languages = [
-    { id: 'pt-BR', title: 'Portugues' },
-    { id: 'us', title: 'English' }
-  ]
-
-  const currencys = [
-    { id: 'BRL', title: 'Real' },
-    { id: 'USD', title: 'Dolar' }
-  ]
-
-  function handleConfirm() {
-
-  }
+  useEffect(() => {
+    if (!isFocused) navigation.goBack()
+  }, [isFocused])
 
   return (
     <Container>
@@ -77,11 +51,11 @@ export function UserDetails() {
           color='attention'
           onPress={signOut}
         />
-        {/* <UIButton
+        <UIButton
           title={t('Delete account')}
           color='attention'
           onPress={cleanStorage}
-        /> */}
+        />
       </Buttons>
     </Container>
   );

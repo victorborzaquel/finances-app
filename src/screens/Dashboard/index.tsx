@@ -88,7 +88,7 @@ export function Dashboard() {
   }
 
   function handleAmountVisible() {
-    updateUser({...user, money_hide: !user.money_hide})
+    updateUser({ money_hide: !user.money_hide })
   }
 
   function hideAmount() {
@@ -113,7 +113,8 @@ export function Dashboard() {
       <Header>
         <HeaderContent>
           <UserAvatar>
-            <AvatarButton onPress={handleUserDetails}>
+            {/* <AvatarButton onPress={handleUserDetails}> */}
+            <AvatarButton>
               <AvatarImage />
             </AvatarButton>
             
@@ -124,13 +125,13 @@ export function Dashboard() {
             </Greetings>
           </UserAvatar>
 
-          {/* <SettingButton style={shadow.two} onPress={handleSettings}>
+          <SettingButton style={shadow.two} onPress={handleSettings}>
             <UIIcon
               icon_interface="settings"
-              color="background"
+              color="background_is_dark"
               size={24}
             />
-          </SettingButton> */}
+          </SettingButton>
         </HeaderContent>
       </Header>
 

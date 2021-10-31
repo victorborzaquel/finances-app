@@ -16,7 +16,7 @@ export function UIButton({press=false, title='Button', color='main', onPress=() 
     <Container
       press={press} 
       color={color} 
-      disabled={press} 
+      enabled={!press} 
       onPress={onPress}
       heightDivider={heightDivider}
       {...rest}

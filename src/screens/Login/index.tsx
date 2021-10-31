@@ -23,14 +23,14 @@ import {
 
 export function Login() {
   const theme = useTheme()
-  const { signInWithGoogle } = useAuth()
+  const { signIn } = useAuth()
   const [loading, setLoading] = useState(false)
 
   async function handleSignInWithGoogle() {
     let isActive = true
     try {
       setLoading(true)
-      return await signInWithGoogle()
+      return await signIn('google')
     } catch (error: any) {
       Alert.alert('Ops', 'Não foi possivel entrar com a conta google.')
       console.log('Erro ao entrar com a conta google: ' + error.message)

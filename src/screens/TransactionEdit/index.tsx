@@ -14,21 +14,21 @@ import { useAuth } from '../../hooks/auth'
 import {
   Amount,
   AmountButton,
-  Container, 
-  DeleteTransactionButton, 
-  Footer, 
-  Form, 
-  GoBackButtonWrapper, 
+  Container,
+  DeleteTransactionButton,
+  Footer,
+  Form,
+  GoBackButtonWrapper,
   Header,
 } from './styles';
-import { CalculatorModal } from '../../components/CalculatorModal';
-import { CategoryModal } from '../../components/CategoryModal';
-import { AccountModal } from '../../components/AccountModal'
-import { otherCategory } from '../../data/CategoryDefaultData'
+import { Calculator } from '../../components/Calculator';
 import { RootTransactionsRouteProps } from '../../routes/TransactionsRoutes'
 import { UIIcon } from '../../components/UIIcon'
-import { ShadowBackground } from '../../components/ShadowBackground'
 import { t } from 'i18n-js'
+import { Modalize } from 'react-native-modalize'
+import { ListSelect } from '../../components/ListSelect'
+import { useTheme } from 'styled-components'
+import { useModalize } from '../../hooks/modalize'
 
 export function TransactionEdit() {
   const { toCurrency, toDate } = useLocalization()
@@ -37,25 +37,29 @@ export function TransactionEdit() {
   const navigation = useNavigation()
   const route = useRoute<RootTransactionsRouteProps<'TransactionEdit'>>()
   const { transactionId } = route.params
-  const transaction = transactions.find(transaction => transaction.id === transactionId) 
+  const transaction = transactions.find(transaction => transaction.id === transactionId)
 
   if (!transaction) throw new Error('Transação não existe.')
 
   const accountTransaction = accounts.find(account => account.id === transaction.account_id)
   const categoryTransaction = categories.find(category => category.id === transaction.category_id)
 
-  const [transactionType, setTransactionType] = useState<TransactionType>(transaction.type)
+  const [transactionType] = useState<TransactionType>(transaction.type)
   const [transactionConfirmed, setTransactionConfirmed] = useState(transaction.confirmed)
   const [description, setDescription] = useState(transaction.description)
   const [date, setDate] = useState(new Date(transaction.date))
   const [amount, setAmount] = useState(transaction.amount)
   const [category, setCategory] = useState(categoryTransaction as ICategory)
   const [account, setAccount] = useState(accountTransaction as IAccount)
-  
+
   const [dateModalVisible, setDateModalVisible] = useState(false)
-  const [calculatorModalVisible, setCalculatorModalVisible] = useState(false)
-  const [categoryModalVisible, setCategoryModalVisible] = useState(false)
-  const [accountModalVisible, setAccountModalVisible] = useState(false)
+
+  const theme = useTheme()
+  const { createModalize } = useModalize()
+
+  const calculatorModal = createModalize()
+  const categoryModal = createModalize()
+  const accountModal = createModalize()
 
   function handleSelectDate(event: any, date?: Date | undefined) {
     setDateModalVisible(Platform.OS === 'ios')
@@ -63,7 +67,7 @@ export function TransactionEdit() {
   }
 
   function handleUpdateTransaction() {
-    if (amount === 0) return Alert.alert('Ops','Você precisa colocar um valor!')
+    if (amount === 0) return Alert.alert('Ops', 'Você precisa colocar um valor!')
 
     updateData('transaction', {
       id: transactionId,
@@ -87,12 +91,12 @@ export function TransactionEdit() {
 
   function handleDeleteTransaction() {
     Alert.alert(
-      'Tem certeza que quer deletar essa transação?', 
+      'Tem certeza que quer deletar essa transação?',
       'Essa ação não podera ser desfeita!',
       [
         {
           text: "Cancelar",
-          onPress: () => {},
+          onPress: () => { },
           style: "cancel"
         },
         {
@@ -109,127 +113,138 @@ export function TransactionEdit() {
 
   useEffect(() => {
     if (!isFocused) navigation.goBack()
-  },[isFocused])
+  }, [isFocused])
 
   return (
-    <Container>
-      <Header color={transactionType === 'income' ? 'success' : 'attention'}>
-        <GoBackButtonWrapper>
-          <GoBackButton color="background_secondary" navigation={navigation} />
+    <>
+      <Container>
+        <Header color={transactionType === 'income' ? 'success' : 'attention'}>
+          <GoBackButtonWrapper>
+            <GoBackButton color="background_secondary" navigation={navigation} />
 
-          <DeleteTransactionButton onPress={handleDeleteTransaction}>
-            <UIIcon
-              icon_interface="trash"
-              size={24}
-              color='background_secondary'
+            <DeleteTransactionButton onPress={handleDeleteTransaction}>
+              <UIIcon
+                icon_interface="trash"
+                size={24}
+                color='background_secondary'
+              />
+            </DeleteTransactionButton>
+          </GoBackButtonWrapper>
+
+          <AmountButton onPress={calculatorModal.open}>
+            <Amount>{toCurrency(amount)}</Amount>
+          </AmountButton>
+        </Header>
+
+        {transaction.type === 'expense' && (
+          <Form>
+            <InputToggle
+              title={transactionConfirmed ? t('Paid') : t('Not paid')}
+              color="attention"
+              state={transactionConfirmed}
+              setState={setTransactionConfirmed}
+              icon="check-square"
             />
-          </DeleteTransactionButton>
-        </GoBackButtonWrapper>
+            <InputModal
+              title={toDate(date, 'allDate', true)}
+              setOpenModal={setDateModalVisible}
+              icon="calendar"
+            />
+            <InputModal
+              title={category.name}
+              setOpenModal={categoryModal.open}
+              icon="folder"
+            />
+            <InputModal
+              title={account.name}
+              setOpenModal={accountModal.open}
+              icon="credit-card"
+            />
+            <InputText
+              title={t('Description')}
+              state={description}
+              setState={setDescription}
+              icon="align-left"
+            />
+          </Form>
+        )}
 
-        <AmountButton onPress={() => setCalculatorModalVisible(true)}>
-          <Amount>{toCurrency(amount)}</Amount>
-        </AmountButton>
-      </Header>
+        {transaction.type === 'income' && (
+          <Form>
+            <InputToggle
+              title={transactionConfirmed ? t('Received') : t('Not received')}
+              color="success"
+              state={transactionConfirmed}
+              setState={setTransactionConfirmed}
+              icon="check-square"
+            />
+            <InputModal
+              title={toDate(date, 'allDate', true)}
+              setOpenModal={setDateModalVisible}
+              icon="calendar"
+            />
+            <InputModal
+              title={category.name}
+              setOpenModal={categoryModal.open}
+              icon="folder"
+            />
+            <InputModal
+              title={account.name}
+              setOpenModal={accountModal.open}
+              icon="credit-card"
+            />
+            <InputText
+              title={t('Description')}
+              state={description}
+              setState={setDescription}
+              icon="align-left"
+            />
+          </Form>
+        )}
 
-      {transaction.type === 'expense' && (
-        <Form>
-          <InputToggle
-            title={transactionConfirmed ? t('Paid') : t('Not paid')} 
-            color="attention"
-            state={transactionConfirmed}
-            setState={setTransactionConfirmed}
-            icon="check-square"
+        <Footer>
+          <UIButton
+            title={t('Confirm')}
+            color="main"
+            onPress={handleUpdateTransaction}
           />
-          <InputModal
-            title={toDate(date, 'allDate', true)} 
-            setOpenModal={setDateModalVisible}
-            icon="calendar"
-          />
-          <InputModal
-            title={category.name}
-            setOpenModal={setCategoryModalVisible}
-            icon="folder"
-          />
-          <InputModal
-            title={account.name}
-            setOpenModal={setAccountModalVisible}
-            icon="credit-card"
-          />
-          <InputText
-            title={t('Description')}
-            state={description}
-            setState={setDescription}
-            icon="align-left"
-          />
-        </Form>
-      )}
+        </Footer>
+      </Container>
 
-      {transaction.type === 'income' && (
-        <Form>
-          <InputToggle
-            title={transactionConfirmed ? t('Received') : t('Not received')} 
-            color="success"
-            state={transactionConfirmed}
-            setState={setTransactionConfirmed}
-            icon="check-square"
-          />
-          <InputModal
-            title={toDate(date, 'allDate', true)} 
-            setOpenModal={setDateModalVisible}
-            icon="calendar"
-          />
-          <InputModal
-            title={category.name}
-            setOpenModal={setCategoryModalVisible}
-            icon="folder"
-          />
-          <InputModal
-            title={account.name}
-            setOpenModal={setAccountModalVisible}
-            icon="credit-card"
-          />
-          <InputText
-            title={t('Description')}
-            state={description}
-            setState={setDescription}
-            icon="align-left"
-          />
-        </Form>
-      )}
-
-      <Footer>
-        <UIButton
-          title={t('Confirm')}
-          color="main"
-          onPress={handleUpdateTransaction}
+      <Modalize // Calculator
+        ref={calculatorModal.ref}
+        withHandle={false}
+        adjustToContentHeight
+      >
+        <Calculator
+          setAmount={setAmount}
+          close={calculatorModal.close}
         />
-      </Footer>
+      </Modalize>
 
-      {(calculatorModalVisible || 
-        categoryModalVisible ||
-        accountModalVisible
-      ) && (
-        <ShadowBackground/>
-      )}
-      
-      <CalculatorModal
-        visible={calculatorModalVisible}
-        setVisible={setCalculatorModalVisible}
-        setAmount={setAmount}
-      />
+      <Modalize // Category
+        ref={categoryModal.ref}
+        snapPoint={theme.display.window_height / 2}
+      >
+        <ListSelect
+          setState={setCategory}
+          close={categoryModal.close}
+          data={categories}
+          type="category"
+        />
+      </Modalize>
 
-      <AccountModal
-        visible={accountModalVisible}
-        setVisible={setAccountModalVisible}
-        setAccount={setAccount}
-      />
-
-      <CategoryModal
-        visible={categoryModalVisible}
-        setVisible={setCategoryModalVisible}
-        setCategory={setCategory}
-        type={transactionType}
-      />
+      <Modalize // Account
+        ref={accountModal.ref}
+        adjustToContentHeight
+      >
+        <ListSelect
+          setState={setAccount}
+          close={accountModal.close}
+          data={accounts}
+          type="account"
+        />
+      </Modalize>
 
       {dateModalVisible && (
         <DateTimePicker
@@ -241,6 +256,6 @@ export function TransactionEdit() {
           onChange={handleSelectDate}
         />
       )}
-    </Container>
+    </>
   );
 }

@@ -19,15 +19,15 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.myfinances",
+      "bundleIdentifier": "com.grupokvb.myfinances",
       "buildNumber": "1.0.0"
     },
     "android": {
-      "package": "com.myfinances",
+      "package": "com.grupokvb.myfinances",
       "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#F2F3F5",
+        "backgroundColor": "#F2F3F5"
       }
     },
     "web": {

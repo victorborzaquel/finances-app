@@ -7,7 +7,7 @@ export const Container = styled.TouchableOpacity.attrs({
   width: 100%;
   align-items: center;
   justify-content: space-between;
-  padding: ${({ theme }) => theme.display.padding_app / 2}px 0;
+  height: ${({ theme }) => theme.display.button_height}px;
   border-bottom-width: 1px;
   border-bottom-color: ${({ theme }) => theme.colors.line};
 `;

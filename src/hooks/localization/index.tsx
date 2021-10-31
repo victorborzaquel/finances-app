@@ -33,14 +33,18 @@ const LocalizationContext = createContext({} as {
 })
 
 function LocalizationProvider({children}: {children: ReactNode}) {
-  const {user} = useAuth();
-  const [language, setLanguage] = useState<LanguageType>('pt-BR');
-  const [localizationLoaded, setLocalizationLoaded] = useState(false);
+  const {
+    user, 
+    translateDefaultData
+  } = useAuth()
+  const [language, setLanguage] = useState<LanguageType>('pt-BR')
+  const [currency, setCurrency] = useState<LanguageType>('pt-BR')
+  const [localizationLoaded, setLocalizationLoaded] = useState(false)
 
-  I18n.locale = language;
-  I18n.translations = languages.dictionary;
-  I18n.defaultLocale = 'us';
-  I18n.fallbacks = true;
+  I18n.locale = language
+  I18n.translations = languages.dictionary
+  ;(async () => { I18n.defaultLocale = await getSupportedLanguage() })()
+  I18n.fallbacks = true
 
   const operatorsLocale = languages.operators.us
   const [operatorsKeys, operatorsValues]  = Object
@@ -51,7 +55,7 @@ function LocalizationProvider({children}: {children: ReactNode}) {
   )
   
   function toCurrency(amount: string | number) {
-    return I18n.toCurrency(Number(amount), languages.currency[language])
+    return I18n.toCurrency(Number(amount), languages.currency[currency])
   }
   function toNumber(number: string | number) {
     return I18n.toNumber(Number(number), languages.number[language])
@@ -78,40 +82,53 @@ function LocalizationProvider({children}: {children: ReactNode}) {
       else if (isSameDay(date, addDays(new Date(), 1))) return languages.calendar[language].tomorrow
     }
     const { convert, locale } = languages.date[language]
-    console.log(convert)
+
     return format(new Date(date), convert[type], { locale })
   }
 
-  async function setCurrentLanguage() {
-    setLocalizationLoaded(false);
-    function getSupportedLanguage(country: string) {
-      switch (country) {
-        case 'pt': return 'pt-BR';
-        case 'us': return 'us';
-        default: return 'us';
-      }
+  async function getSupportedLanguage() {
+    const { locale } = await Localization.getLocalizationAsync()
+    const country = locale.split('-')[0]
+    
+    switch (country) {
+      case 'pt': return 'pt-BR'
+      case 'us': return 'us'
+      default: return 'us'
     }
+  }
 
+  async function setCurrentLanguage() {
+    setLocalizationLoaded(false)
+    
     try {
-      if (!!user.id && user.language !== 'auto') return user.language;
+      const currLanguage = await getSupportedLanguage()
 
-      const { locale } = await Localization.getLocalizationAsync();
-      const country = locale.split('-')[0];
+      if (user.language !== 'auto') {
+        setLanguage(user.language)
+        I18n.locale = user.language
+      } else {
+        setLanguage(currLanguage)
+        I18n.locale = currLanguage
+      }
 
-      const currLanguage = getSupportedLanguage(country);
-      setLanguage(currLanguage);
-      I18n.locale = currLanguage;
+      if (user.currency !== 'auto') {
+        setCurrency(user.currency)
+      } else {
+        setCurrency(currLanguage)
+      }
+
+      translateDefaultData()
     } catch (error: any) {
       throw new Error(error)
     } finally {
-      setLocalizationLoaded(true);
+      
+      setLocalizationLoaded(true)
     }
   }
 
   useEffect(() => {
-    setCurrentLanguage();
-    if (language) I18n.locale = language;
-  },[language])
+    setCurrentLanguage()
+  },[user.language, user.currency])
   
   return (
     <LocalizationContext.Provider value={{
@@ -129,8 +146,8 @@ function LocalizationProvider({children}: {children: ReactNode}) {
 }
 
 function useLocalization() {
-  const context = useContext(LocalizationContext);
-  return context;
+  const context = useContext(LocalizationContext)
+  return context
 }
 
 export {

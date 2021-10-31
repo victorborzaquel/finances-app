@@ -6,7 +6,7 @@ import { ITransaction, TransactionType } from "../../global/interfaces";
 
 export const Container = styled.View<{space: number}>`
   flex: 1;
-  /* padding-bottom: ${({ space }) => space + getBottomSpace()}px; */
+  background-color: ${({ theme }) => theme.colors.background};
 `;
 
 export const Buttons = styled.View`

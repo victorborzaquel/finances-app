@@ -1,26 +1,28 @@
 import React from 'react'
-import { ThemeProvider } from 'styled-components/native'
-import theme from '../../global/themes'
+import { ThemeProvider } from '../theme'
 import { AuthProvider } from '../auth'
 import { CachedProvider } from '../cached'
 import { DataProvider } from '../data'
 import { LocalizationProvider } from '../localization'
 import { StyleProvider } from '../style'
+import { ModalizeProvider } from '../modalize'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider theme={theme}>
-      <AuthProvider>
+    <AuthProvider>
+      <ThemeProvider>
         <LocalizationProvider>
           <DataProvider>
-            <CachedProvider>
-              <StyleProvider>
-                {children}
-              </StyleProvider>
-            </CachedProvider>
+            <ModalizeProvider>
+              <CachedProvider>
+                <StyleProvider>
+                  {children}
+                </StyleProvider>
+              </CachedProvider>
+            </ModalizeProvider>
           </DataProvider>
         </LocalizationProvider>
-      </AuthProvider>
-    </ThemeProvider>
+      </ThemeProvider>
+    </AuthProvider>
   )
 }

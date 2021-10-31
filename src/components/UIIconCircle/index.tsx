@@ -32,7 +32,7 @@ export function UIIconCircle({
       <Ionicons
         name={IoniconsIconName()}
         size={RFValue(size / 2)}
-        color={theme.colors.background}
+        color={theme.colors.background_is_dark}
       />
     </Container>
   )

@@ -8,7 +8,7 @@ interface Props {
 
 const UserDefaultData: Props = {
   language: 'auto',
-  theme: 'auto',
+  theme: 'light',
   currency: 'auto',
 }
 

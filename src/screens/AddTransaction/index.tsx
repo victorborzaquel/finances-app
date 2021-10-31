@@ -17,22 +17,22 @@ import {
   Amount,
   AmountButton,
   Buttons,
-  Container, 
-  Footer, 
-  Form, 
-  Forms, 
-  GoBackButtonWrapper, 
+  Container,
+  Footer,
+  Form,
+  Forms,
+  GoBackButtonWrapper,
   Header,
   TransferIndicator,
   TransferText,
 } from './styles';
-import { CalculatorModal } from '../../components/CalculatorModal';
-import { CategoryModal } from '../../components/CategoryModal';
-import { AccountModal } from '../../components/AccountModal'
+import { Calculator } from '../../components/Calculator';
 import { otherCategory } from '../../data/CategoryDefaultData'
-import { ShadowBackground } from '../../components/ShadowBackground'
 import { UIIcon } from '../../components/UIIcon'
 import { t } from 'i18n-js'
+import { Modalize } from 'react-native-modalize'
+import { useModalize } from '../../hooks/modalize'
+import { ListSelect } from '../../components/ListSelect'
 
 export function AddTransaction() {
   const [transactionType, setTransactionType] = useState<TransactionType>('expense')
@@ -43,24 +43,27 @@ export function AddTransaction() {
   const [category, setCategory] = useState({} as ICategory)
   const [account, setAccount] = useState({} as IAccount)
 
+  const { createModalize } = useModalize()
+
   const [transferAccountOrigin, setTransferAccountOrigin] = useState({} as IAccount)
   const [transferAccountDestination, setTransferAccountDestination] = useState({} as IAccount)
-  
+
   const [dateModalVisible, setDateModalVisible] = useState(false)
-  const [calculatorModalVisible, setCalculatorModalVisible] = useState(false)
-  const [categoryModalVisible, setCategoryModalVisible] = useState(false)
-  const [accountModalVisible, setAccountModalVisible] = useState(false)
-  const [transferAccountDestinationModalVisible, setTransferAccountDestinationModalVisible] = useState(false)
-  const [transferAccountOriginModalVisible, setTransferAccountOriginModalVisible] = useState(false)
 
   const scrollRef = useRef<ScrollView>()
   const { toCurrency, toDate } = useLocalization()
-  const { addData, useDefaultAccount, user } = useAuth()
+  const { addData, useDefaultAccount, user, categories, accounts } = useAuth()
   const isFocused = useIsFocused()
   const navigation = useNavigation()
   const theme = useTheme()
   const defaultAccount = useDefaultAccount()
-  
+
+  const calculatorModal = createModalize()
+  const categoryModal = createModalize()
+  const accountModal = createModalize()
+  const transferAccountOriginModal = createModalize()
+  const transferAccountDestinationModal = createModalize()
+
   const transactionTypeScrollData: TransactionType[] = ['expense', 'income', 'transfer'];
 
   function setHeaderBackground(): ButtonType {
@@ -101,9 +104,9 @@ export function AddTransaction() {
 
   function handleCreateTransaction() {
     if (transferAccountOrigin === transferAccountDestination && transactionType === 'transfer') {
-      return Alert.alert('Ops','As contas da transferencia não podem ser iguais!')
+      return Alert.alert('Ops', 'As contas da transferencia não podem ser iguais!')
     }
-    if (amount === 0) return Alert.alert('Ops','Você precisa colocar um valor!')
+    if (amount === 0) return Alert.alert('Ops', 'Você precisa colocar um valor!')
 
     if (transactionType === 'transfer') {
       addData('transfer', {
@@ -146,191 +149,214 @@ export function AddTransaction() {
 
   useEffect(() => {
     if (isFocused) {
-      setCalculatorModalVisible(true)
+      calculatorModal.open()
     } else {
       resetData()
     }
-  },[isFocused])
+  }, [isFocused])
 
   return (
-    <Container>
-      <Header color={setHeaderBackground()}>
-        <GoBackButtonWrapper>
-          <GoBackButton color="background_secondary" navigation={navigation} />
-        </GoBackButtonWrapper>
+    <>
+      <Container>
+        <Header color={setHeaderBackground()}>
+          <GoBackButtonWrapper>
+            <GoBackButton color="background_is_dark_secondary" navigation={navigation} />
+          </GoBackButtonWrapper>
 
-        <AmountButton onPress={() => setCalculatorModalVisible(true)}>
-          <Amount>{toCurrency(amount)}</Amount>
-        </AmountButton>
+          <AmountButton onPress={calculatorModal.open}>
+            <Amount>{toCurrency(amount)}</Amount>
+          </AmountButton>
 
-        <Buttons>
-          <UIButton
-            title={t('Expense')}
-            press={transactionType === 'expense'} 
-            color="attention" 
-            onPress={()=> handleButtonTypePress('expense')}
-          />
-          <UIButton
-            title={t('Income')}
-            press={transactionType === 'income'} 
-            color="success" 
-            onPress={()=> handleButtonTypePress('income')}
-          />
-          <UIButton
-            title={t('Transfer')}
-            press={transactionType === 'transfer'} 
-            color="secondary" 
-            onPress={()=> handleButtonTypePress('transfer')}
-          />
-        </Buttons>
-      </Header>
-
-      <Forms
-        onScroll={handleOnScroll}
-        ref={scrollRef as any}
-      >
-        <Form>
-          <InputToggle
-            title={transactionConfirmed ? t('Paid') : t('Not paid')} 
-            color="attention"
-            state={transactionConfirmed}
-            setState={setTransactionConfirmed}
-            icon="check-square"
-          />
-          <InputModal
-            title={toDate(date, 'allDate', true)} 
-            setOpenModal={setDateModalVisible}
-            icon="calendar"
-          />
-          <InputModal
-            title={isCurrentCategoryType() ? category.name : otherCategory[transactionType].name}
-            setOpenModal={setCategoryModalVisible}
-            icon="folder"
-          />
-          <InputModal
-            title={!!account.id ? account.name : defaultAccount.name}
-            setOpenModal={setAccountModalVisible}
-            icon="credit-card"
-          />
-          <InputText
-            title={t('Description')}
-            state={description}
-            setState={setDescription}
-            icon="align-left"
-          />
-        </Form>
-
-        <Form>
-          <InputToggle
-            title={transactionConfirmed ? t('Received') : t('Not received')} 
-            color="success"
-            state={transactionConfirmed}
-            setState={setTransactionConfirmed}
-            icon="check-square"
-          />
-          <InputModal
-            title={toDate(date, 'allDate', true)} 
-            setOpenModal={setDateModalVisible}
-            icon="calendar"
-          />
-          <InputModal
-            title={isCurrentCategoryType() ? category.name : otherCategory[transactionType].name}
-            setOpenModal={setCategoryModalVisible}
-            icon="folder"
-          />
-          <InputModal
-            title={!!account.id ? account.name : defaultAccount.name}
-            setOpenModal={setAccountModalVisible}
-            icon="credit-card"
-          />
-          <InputText
-            title={t('Description')}
-            state={description}
-            setState={setDescription}
-            icon="align-left"
-          />
-        </Form>
-
-        <Form>
-          <InputModal
-            title={toDate(date, 'allDate', true)} 
-            setOpenModal={setDateModalVisible}
-            icon="calendar"
-          />
-          <InputModal
-            title={!!transferAccountOrigin.id ? transferAccountOrigin.name : t('Origin account')}
-            color={!!transferAccountOrigin.id ? undefined : 'text_details'}
-            setOpenModal={setTransferAccountOriginModalVisible}
-            icon="credit-card"
-          />
-          <TransferIndicator>
-            <TransferText>{t('Transfer to')}</TransferText>
-            <UIIcon
-              icon_interface='chevron-down'
-              color='title'
-              size={34}
+          <Buttons>
+            <UIButton
+              title={t('Expense')}
+              press={transactionType === 'expense'}
+              color="attention"
+              onPress={() => handleButtonTypePress('expense')}
             />
-          </TransferIndicator>
-          <InputModal
-            title={!!transferAccountDestination.id ? transferAccountDestination.name : t('Destination account')}
-            color={!!transferAccountDestination.id ? undefined : 'text_details'}
-            setOpenModal={setTransferAccountDestinationModalVisible}
-            icon="credit-card"
-          />
-          <InputText
-            title={t('Description')}
-            state={description}
-            setState={setDescription}
-            icon="align-left"
-          />
-        </Form>
-      </Forms>
+            <UIButton
+              title={t('Income')}
+              press={transactionType === 'income'}
+              color="success"
+              onPress={() => handleButtonTypePress('income')}
+            />
+            <UIButton
+              title={t('Transfer')}
+              press={transactionType === 'transfer'}
+              color="secondary"
+              onPress={() => handleButtonTypePress('transfer')}
+            />
+          </Buttons>
+        </Header>
 
-      <Footer>
-        <UIButton
-          title={t('Confirm')}
-          color="main"
-          onPress={handleCreateTransaction}
+        <Forms
+          onScroll={handleOnScroll}
+          ref={scrollRef as any}
+        >
+          <Form>
+            <InputToggle
+              title={transactionConfirmed ? t('Paid') : t('Not paid')}
+              color="attention"
+              state={transactionConfirmed}
+              setState={setTransactionConfirmed}
+              icon="check-square"
+            />
+            <InputModal
+              title={toDate(date, 'allDate', true)}
+              setOpenModal={setDateModalVisible}
+              icon="calendar"
+            />
+            <InputModal
+              title={isCurrentCategoryType() ? category.name : t(otherCategory[transactionType].name)}
+              setOpenModal={categoryModal.open}
+              icon="folder"
+            />
+            <InputModal
+              title={!!account.id ? account.name : defaultAccount.name}
+              setOpenModal={accountModal.open}
+              icon="credit-card"
+            />
+            <InputText
+              title={t('Description')}
+              state={description}
+              setState={setDescription}
+              icon="align-left"
+            />
+          </Form>
+
+          <Form>
+            <InputToggle
+              title={transactionConfirmed ? t('Received') : t('Not received')}
+              color="success"
+              state={transactionConfirmed}
+              setState={setTransactionConfirmed}
+              icon="check-square"
+            />
+            <InputModal
+              title={toDate(date, 'allDate', true)}
+              setOpenModal={setDateModalVisible}
+              icon="calendar"
+            />
+            <InputModal
+              title={isCurrentCategoryType() ? category.name : t(otherCategory[transactionType].name)}
+              setOpenModal={categoryModal.open}
+              icon="folder"
+            />
+            <InputModal
+              title={!!account.id ? account.name : defaultAccount.name}
+              setOpenModal={accountModal.open}
+              icon="credit-card"
+            />
+            <InputText
+              title={t('Description')}
+              state={description}
+              setState={setDescription}
+              icon="align-left"
+            />
+          </Form>
+
+          <Form>
+            <InputModal
+              title={toDate(date, 'allDate', true)}
+              setOpenModal={setDateModalVisible}
+              icon="calendar"
+            />
+            <InputModal
+              title={!!transferAccountOrigin.id ? transferAccountOrigin.name : t('Origin account')}
+              color={!!transferAccountOrigin.id ? undefined : 'text_details'}
+              setOpenModal={transferAccountOriginModal.open}
+              icon="credit-card"
+            />
+            <TransferIndicator>
+              <TransferText>{t('Transfer to')}</TransferText>
+              <UIIcon
+                icon_interface='chevron-down'
+                color='title'
+                size={34}
+              />
+            </TransferIndicator>
+            <InputModal
+              title={!!transferAccountDestination.id ? transferAccountDestination.name : t('Destination account')}
+              color={!!transferAccountDestination.id ? undefined : 'text_details'}
+              setOpenModal={transferAccountDestinationModal.open}
+              icon="credit-card"
+            />
+            <InputText
+              title={t('Description')}
+              state={description}
+              setState={setDescription}
+              icon="align-left"
+            />
+          </Form>
+        </Forms>
+
+        <Footer>
+          <UIButton
+            title={t('Confirm')}
+            color="main"
+            onPress={handleCreateTransaction}
+          />
+        </Footer>
+      </Container>
+
+      <Modalize // Calculator
+        ref={calculatorModal.ref}
+        withHandle={false}
+        adjustToContentHeight
+      >
+        <Calculator
+          setAmount={setAmount}
+          close={calculatorModal.close}
         />
-      </Footer>
+      </Modalize>
 
-      {(calculatorModalVisible || 
-        categoryModalVisible ||
-        accountModalVisible
-      ) && (
-        <ShadowBackground/>
-      )}
+      <Modalize // Category
+        ref={categoryModal.ref}
+        snapPoint={theme.display.window_height / 2}
+      >
+        <ListSelect
+          setState={setCategory}
+          close={categoryModal.close}
+          data={categories}
+          type="category"
+        />
+      </Modalize>
 
-      <CalculatorModal
-        visible={calculatorModalVisible}
-        setVisible={setCalculatorModalVisible}
-        setAmount={setAmount}
-      />
+      <Modalize // Account
+        ref={accountModal.ref}
+        adjustToContentHeight
+      >
+        <ListSelect
+          setState={setAccount}
+          close={accountModal.close}
+          data={accounts}
+          type="account"
+        />
+      </Modalize>
 
-      <AccountModal
-        visible={accountModalVisible}
-        setVisible={setAccountModalVisible}
-        setAccount={setAccount}
-      />
+      <Modalize // Account Destination
+        ref={transferAccountDestinationModal.ref}
+        adjustToContentHeight
+      >
+        <ListSelect
+          setState={setTransferAccountDestination}
+          close={transferAccountDestinationModal.close}
+          data={accounts}
+          type="account"
+        />
+      </Modalize>
 
-      <AccountModal
-        visible={transferAccountOriginModalVisible}
-        setVisible={setTransferAccountOriginModalVisible}
-        setAccount={setTransferAccountOrigin}
-      />
-
-      <AccountModal
-        visible={transferAccountDestinationModalVisible}
-        setVisible={setTransferAccountDestinationModalVisible}
-        setAccount={setTransferAccountDestination}
-      />
-
-      <CategoryModal
-        visible={categoryModalVisible}
-        setVisible={setCategoryModalVisible}
-        setCategory={setCategory}
-        type={transactionType}
-      />
+      <Modalize // Account Origin
+        ref={transferAccountOriginModal.ref}
+        adjustToContentHeight
+      >
+        <ListSelect
+          setState={setTransferAccountOrigin}
+          close={transferAccountOriginModal.close}
+          data={accounts}
+          type="account"
+        />
+      </Modalize>
 
       {dateModalVisible && (
         <DateTimePicker
@@ -342,7 +368,6 @@ export function AddTransaction() {
           onChange={handleSelectDate}
         />
       )}
-      
-    </Container>
+    </>
   );
 }

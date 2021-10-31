@@ -1,53 +1,63 @@
-import React, { useState } from 'react';
-import { Button } from 'react-native';
-import { GoBackButton } from '../../components/GoBackButton';
+import React, { useEffect } from 'react';
 import { useAuth } from '../../hooks/auth';
-import { useNavigation } from '@react-navigation/native'
+import { useIsFocused, useNavigation } from '@react-navigation/native'
 
 import {
   Container,
+  Footer,
   GoBackHeader,
-  GoBackTitle, 
+  GoBackTitle,
   Inputs
 } from './styles';
-import { InputToggle } from '../../components/InputToggle';
-import { UIButton } from '../../components/UIButton';
-import { ListModal } from '../../components/ListModal';
 import { InputModal } from '../../components/InputModal';
-import { AccountModal } from '../../components/AccountModal';
-import { IAccount } from '../../global/interfaces';
-import * as Localization from 'expo-localization';
 import { Header } from '../../components/Header';
 import { UIIcon } from '../../components/UIIcon';
+import { ListSelect } from '../../components/ListSelect';
+import { Modalize } from 'react-native-modalize';
+import { useModalize } from '../../hooks/modalize';
+import { UIButton } from '../../components/UIButton';
+import { t } from 'i18n-js';
 
 export function Settings() {
-  const { signOut, cleanStorage, user, accounts } = useAuth()
+  const { user, accounts, signOut } = useAuth()
   const navigation = useNavigation()
+  const isFocused = useIsFocused()
 
-  const [darkMode, setDarkMode] = useState(false)
-  const [language, setLanguage] = useState('')
-  const [currency, setCurrency] = useState('')
-  const [account, setAccount] = useState({} as IAccount)
+  const { createModalize } = useModalize()
 
-  const [languageModalVisible, setLanguageModalVisible] = useState(false)
-  const [accountModalVisible, setAccountModalVisible] = useState(false)
-  const [currencyModalVisible, setCurrencyModalVisible] = useState(false)
+  const languageModal = createModalize()
+  const currencyModal = createModalize()
+  const accountModal = createModalize()
+  const themeModal = createModalize()
 
   const languages = [
-    {id: 'pt-BR', title: 'Portugues'},
-    {id: 'us', title: 'English'}
+    { id: 'pt-BR', name: 'Portugues' },
+    { id: 'us', name: 'English' },
+    { id: 'auto', name: 'Auto' },
   ]
 
   const currencys = [
-    {id: 'BRL', title: 'Real'},
-    {id: 'USD', title: 'Dolar'}
+    { id: 'pt-BR', name: 'Real' },
+    { id: 'us', name: 'Dolar' },
+    { id: 'auto', name: 'Auto' },
+  ]
+
+  const themes = [
+    { id: 'dark', name: 'Dark' },
+    { id: 'light', name: 'Light' },
+    { id: 'auto', name: 'Auto' },
   ]
 
   function handleConfirm() {
 
   }
 
+  useEffect(() => {
+    if (!isFocused) navigation.goBack()
+  }, [isFocused])
+
   return (
+    <>
     <Container>
       <Header
         title="Configuração"
@@ -63,52 +73,86 @@ export function Settings() {
 
 
       <Inputs>
-      <InputToggle
-        title='Tema escuro' 
-        color="main"
-        state={darkMode}
-        setState={setDarkMode}
-        icon="check-square"
-      />
-      <InputModal
-        title={'Lingua: ' + user.language}
-        color="title"
-        setOpenModal={setLanguageModalVisible}
-        icon="check-square"
-      />
-      <InputModal
-        title={'Moeda: ' + user.currency}
-        color="title"
-        setOpenModal={setCurrencyModalVisible}
-        icon="check-square"
-      />
-      <InputModal
-        title={'Conta principal: ' + accounts.find(account => account.id === user.default_account_id)?.name}
-        color="title"
-        setOpenModal={setAccountModalVisible}
-        icon="check-square"
-      />
+        <InputModal
+          title={'Tema: ' + themes.find(theme => theme.id === user.theme)?.name}
+          color="title"
+          setOpenModal={themeModal.open}
+          icon="check-square"
+        />
+        <InputModal
+          title={'Lingua: ' + languages.find(language => language.id === user.language)?.name}
+          color="title"
+          setOpenModal={languageModal.open}
+          icon="check-square"
+        />
+        <InputModal
+          title={'Moeda: ' + currencys.find(currency => currency.id === user.currency)?.name}
+          color="title"
+          setOpenModal={currencyModal.open}
+          icon="check-square"
+        />
+        <InputModal
+          title={'Conta principal: ' + accounts.find(account => account.id === user.default_account_id)?.name}
+          color="title"
+          setOpenModal={accountModal.open}
+          icon="check-square"
+        />
       </Inputs>
 
-      <ListModal
-        visible={languageModalVisible}
-        setVisible={setLanguageModalVisible}
-        setState={setLanguage}
-        data={languages}
-      />
-
-      <AccountModal
-        visible={accountModalVisible}
-        setVisible={setAccountModalVisible}
-        setAccount={setAccount}
-      />
-
-      <ListModal
-        visible={currencyModalVisible}
-        setVisible={setCurrencyModalVisible}
-        setState={setCurrency}
-        data={currencys}
-      />
+      <Footer>
+        <UIButton
+          title={t('Logout')}
+          color='attention'
+          onPress={signOut}
+        />
+      </Footer>
+      
     </Container>
+
+          <Modalize // Theme
+        ref={themeModal.ref}
+        adjustToContentHeight
+      >
+        <ListSelect
+          userUpdate='theme'
+          close={themeModal.close}
+          data={themes}
+        />
+      </Modalize>
+
+      <Modalize // Currency
+        ref={currencyModal.ref}
+        adjustToContentHeight
+      >
+        <ListSelect
+          userUpdate='currency'
+          close={currencyModal.close}
+          data={currencys}
+        />
+      </Modalize>
+
+      <Modalize // Language
+        ref={languageModal.ref}
+        adjustToContentHeight
+      >
+        <ListSelect
+          userUpdate='language'
+          close={languageModal.close}
+          data={languages}
+        />
+      </Modalize>
+
+      <Modalize // Account
+        ref={accountModal.ref}
+        adjustToContentHeight
+      >
+        <ListSelect
+          userUpdate='default_account_id'
+          close={accountModal.close}
+          data={accounts}
+          type="account"
+        />
+      </Modalize>
+    </>
   );
 }

@@ -11,7 +11,7 @@ type IconCategoryNameType = keyof typeof IconData['category'];
 type IconAccountNameType = keyof typeof IconData['account'];
 type IconInterfaceNameType =  keyof typeof IconData['interface'];
 type ColorNameType = keyof typeof ColorsData;
-type ThemeColorType = keyof typeof themes.colors;
+type ThemeColorType = keyof typeof themes.light.colors;
 
 type ThemeType =    'auto' | 'light' | 'dark';
 type LanguageType = 'auto' | 'pt-BR' | 'us';
@@ -27,14 +27,33 @@ interface IUser {
   first_name?: string;
   last_name?: string;
   email_verified?: boolean;
-  google_id?: string;
-
+  login_social?: {
+    google_id?: string;
+  };
+  
   money_hide?: boolean;
   language: LanguageType;
   theme: ThemeType;
-  currency: CurrencyType;
+  currency: LanguageType;
 
   default_account_id: string;
+}
+
+interface IUserUpdate {
+  name?: string;
+  email?: string;
+  avatar?: string;
+  email_verified?: boolean;
+  login_social?: {
+    google_id?: string;
+  };
+  
+  money_hide?: boolean;
+  language?: LanguageType;
+  theme?: ThemeType;
+  currency?: LanguageType;
+
+  default_account_id?: string;
 }
 
 interface ITransaction {
@@ -150,6 +169,7 @@ export {
   LanguageType,
   ThemeColorType,
   IUser,
+  IUserUpdate,
   ITransaction,
   ITransfer,
   ICreditCard,

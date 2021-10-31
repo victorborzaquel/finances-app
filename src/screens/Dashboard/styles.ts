@@ -7,6 +7,7 @@ export const Container = styled.ScrollView.attrs({
   showsVerticalScrollIndicator: false
 })`
   flex: 1;
+  background-color: ${({ theme }) => theme.colors.background};
 `;
 
 export const Wrapper = styled.View``;
@@ -51,7 +52,7 @@ export const GreetingText = styled.Text.attrs({
 `;
 
 export const UserName = styled.Text`
-  color: ${({ theme }) => theme.colors.main_title};
+  color: ${({ theme }) => theme.colors.main_hover_title};
   font-family: ${({ theme }) => theme.fonts.family.title};
   font-size: ${({ theme }) => theme.fonts.size.largue}px;
   line-height: ${({ theme }) => theme.fonts.size.largue}px;

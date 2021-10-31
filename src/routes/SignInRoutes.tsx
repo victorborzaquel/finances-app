@@ -1,26 +1,23 @@
 import React from 'react'
-import { 
-  createBottomTabNavigator, 
-  BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { 
-  RouteProp, 
-  NavigatorScreenParams, 
-  ParamListBase, 
-} from '@react-navigation/native';
-import { DashboardRoutes } from './DashboardRoutes';
+import {
+  createBottomTabNavigator,
+  BottomTabNavigationProp
+} from '@react-navigation/bottom-tabs'
+import {
+  RouteProp,
+  NavigatorScreenParams,
+  ParamListBase,
+} from '@react-navigation/native'
+import { DashboardRoutes } from './DashboardRoutes'
 import { RootDashboardParamList } from './DashboardRoutes'
-import { Test } from '../screens/Test';
-import styled, { css } from 'styled-components/native';
-import { ThemeColorType } from '../global/interfaces';
-import { BorderlessButton } from 'react-native-gesture-handler';
-import { AddTransaction } from '../screens/AddTransaction';
-import { RFValue } from 'react-native-responsive-fontsize';
-import { StyleSheet } from 'react-native';
-import { getBottomSpace } from 'react-native-iphone-x-helper';
-import { TabBarIcon, TabBarIconNameType } from '../components/TabBarIcon';
-import { RootTransactionsParamList, TransactionsRoutes } from './TransactionsRoutes';
-import { Charts } from '../screens/Charts';
-import { Goals } from '../screens/Goals';
+import styled, { useTheme } from 'styled-components/native'
+import { BorderlessButton } from 'react-native-gesture-handler'
+import { AddTransaction } from '../screens/AddTransaction'
+import { RFValue } from 'react-native-responsive-fontsize'
+import { TabBarIcon, TabBarIconNameType } from '../components/TabBarIcon'
+import { RootTransactionsParamList, TransactionsRoutes } from './TransactionsRoutes'
+import { Charts } from '../screens/Charts'
+import { Goals } from '../screens/Goals'
 
 export type RootSignInParamList = {
   DashboardRoutes: NavigatorScreenParams<RootDashboardParamList>;
@@ -34,107 +31,104 @@ export type RootSignInNavigationProps<Screen extends keyof RootSignInParamList> 
 export type RootSignInRouteProps<Screen extends keyof RootSignInParamList> = RouteProp<RootSignInParamList, Screen>;
 
 export function SignInRoutes() {
-  const {Screen,Navigator} = createBottomTabNavigator();
+  const { Screen, Navigator } = createBottomTabNavigator()
+  const theme = useTheme()
 
   function selectTabBarIcon(route: RouteProp<ParamListBase, string>): TabBarIconNameType {
     switch (route.name) {
-      case 'DashboardRoutes': return 'home';
-      case 'TransactionsRoutes': return 'calendar';
-      case 'AddTransaction': return 'plus';
-      case 'Charts': return 'bar-chart';
-      case 'Goals': return 'check-circle';
-      default : return 'home';
+      case 'DashboardRoutes': return 'home'
+      case 'TransactionsRoutes': return 'calendar'
+      case 'AddTransaction': return 'plus'
+      case 'Charts': return 'bar-chart'
+      case 'Goals': return 'check-circle'
+      default: return 'home'
     }
+  }
+  const tabBarStyle = {
+    paddingHorizontal: 10,
+    backgroundColor: theme.colors.background_secondary,
+    height: 50
   }
 
   return (
-    <Navigator 
+    <Navigator
       initialRouteName='DashboardRoutes'
-      screenOptions={({route}) => {
-        const isTransaction = route.name === 'AddTransaction';
+      screenOptions={({ route }) => {
+        const isTransaction = route.name === 'AddTransaction'
 
-        return({
+        return ({
           headerShown: false,
           tabBarShowLabel: false,
-          // tabBarStyle: styles.tabBarStyle,
-          tabBarActiveTintColor: 'main' as ThemeColorType,
-          tabBarInactiveTintColor: 'line' as ThemeColorType,
-          tabBarIcon: ({color, ...rest}: any) => (
-            <TabBarIcon 
+          tabBarActiveTintColor: 'main',
+          tabBarInactiveTintColor: 'line',
+          tabBarIcon: ({ color, ...rest }: any) => (
+            <TabBarIcon
               {...rest}
-              color={isTransaction ? 'background_secondary' : color}  
-              name={selectTabBarIcon(route)} 
+              color={isTransaction ? 'background_secondary' : color}
+              name={selectTabBarIcon(route)}
             />
           ),
-          tabBarButton: ({children, ...rest}: any) => (
-            <TabBarBackground isTransaction={isTransaction}>
+          tabBarStyle,
+          tabBarButton: ({ children, ...rest }: any) => isTransaction
+            ? (
               <TabBarButton {...rest}>
-                {children}
+                <TabBarBackground>
+                  {children}
+                </TabBarBackground>
               </TabBarButton>
-            </TabBarBackground>
-          ),
-      })}}
+            ) : (
+              <BorderlessButton {...rest}>
+                <TabBarHeight>
+                  {children}
+                </TabBarHeight>
+              </BorderlessButton>
+            ),
+        })
+      }}
     >
       <Screen
-        name="DashboardRoutes" 
-        component={DashboardRoutes} 
+        name="DashboardRoutes"
+        component={DashboardRoutes}
       />
       <Screen
-        name="TransactionsRoutes" 
-        component={TransactionsRoutes} 
-        options={{ tabBarStyle: {} }}
+        name="TransactionsRoutes"
+        component={TransactionsRoutes}
       />
       <Screen
-        name="AddTransaction" 
-        component={AddTransaction} 
+        name="AddTransaction"
+        component={AddTransaction}
         options={{ tabBarStyle: { display: 'none' } }}
       />
       <Screen
-        name="Charts" 
-        component={Charts} 
+        name="Charts"
+        component={Charts}
       />
       <Screen
-        name="Goals" 
-        component={Goals} 
+        name="Goals"
+        component={Goals}
       />
     </Navigator>
   )
 }
 
-const TabBarBackground = styled.View<{isTransaction: boolean}>`
-${({isTransaction}) => isTransaction 
-  ? css`
-    top: -${RFValue(18)}px;
-    width: ${RFValue(66)}px;
-    height: ${RFValue(66)}px;
-    margin: 0 ${RFValue(6)}px;
+const TabBarBackground = styled.View`
+    width: 100%;
+    height: 100%;
     border-radius: ${RFValue(33)}px;
-    background-color: ${({theme}) => theme.colors.main};`
-  : css` flex: 1;`
-}
+    background-color: ${({ theme }) => theme.colors.main};
 `;
 
-const TabBarButton = styled(BorderlessButton)`
+const TabBarHeight = styled.View`
+    width: 100%;
+    height: 100%;
+`;
+
+const TabBarButton = styled.TouchableOpacity.attrs({
+  activeOpacity: 0.6
+})`
   flex: 1;
+  top: -${RFValue(20)}px;
+  margin: 0 ${RFValue(10)}px;
+  width: ${RFValue(66)}px;
+  height: ${RFValue(66)}px;
 `;
-
-// const styles = StyleSheet.create({
-// 	tabBarStyle: {
-// 		position: 'absolute',
-// 		height: RFValue(65),
-// 		left: 10,
-// 		right: 10,
-// 		bottom: getBottomSpace() + 10,
-// 		borderRadius: 15,
-// 		backgroundColor: '#ffffff',
-
-// 		shadowColor: '#7F5DF0',
-// 		shadowOffset: {
-// 			width: 0,
-// 			height: 10,
-// 		},
-// 		elevation: 5,
-// 		shadowRadius: 3.5,
-// 		shadowOpacity: 0.25,
-// 	},
-// });
