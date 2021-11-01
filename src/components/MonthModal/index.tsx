@@ -1,4 +1,3 @@
-import { DatePickerOptions } from '@react-native-community/datetimepicker';
 import { t } from 'i18n-js';
 import React, { useState } from 'react';
 import { TouchableWithoutFeedback } from 'react-native';

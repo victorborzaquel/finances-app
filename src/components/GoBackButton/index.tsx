@@ -1,5 +1,4 @@
 import { Feather } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
 import React from 'react';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { useTheme, DefaultTheme } from 'styled-components/native';

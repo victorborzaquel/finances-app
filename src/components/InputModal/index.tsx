@@ -1,5 +1,4 @@
 import React from 'react';
-import { useTheme } from 'styled-components/native';
 import { IconInterfaceNameType, ThemeColorType } from '../../global/interfaces';
 import { UIIcon } from '../UIIcon';
 

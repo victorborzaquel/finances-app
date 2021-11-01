@@ -10,7 +10,7 @@ import {
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs'
 import { useIsFocused, useNavigation } from '@react-navigation/native';
 import { useTheme } from 'styled-components';
-import { ICategory, TransactionType } from '../../global/interfaces'
+import { TransactionType } from '../../global/interfaces'
 import { NativeScrollEvent, NativeSyntheticEvent, ScrollView } from 'react-native';
 import { Chart } from '../../components/Chart';
 import { UIButton } from '../../components/UIButton';

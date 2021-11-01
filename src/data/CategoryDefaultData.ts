@@ -1,6 +1,5 @@
 import { ICategory } from "../global/interfaces";
 import IconData from '../data/IconData'
-import { t } from 'i18n-js'
 
 interface Props {
   id: string;

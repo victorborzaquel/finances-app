@@ -8,7 +8,6 @@ import {
   ThemeColorType
 } from '../../global/interfaces';
 import { useTheme } from 'styled-components/native';
-import { getIconName } from '../../utils/getIconName';
 import IconData from '../../data/IconData';
 
 export function UIIcon({

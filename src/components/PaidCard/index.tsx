@@ -2,8 +2,7 @@ import { TransactionType } from '../../global/interfaces';
 import { useAuth } from '../../hooks/auth';
 import { RootSignInNavigationProps } from '../../routes/SignInRoutes';
 import { useNavigation } from '@react-navigation/native';
-import React, { useEffect } from 'react';
-import { otherCategory } from '../../data/CategoryDefaultData';
+import React from 'react';
 import { ITransaction } from '../../global/interfaces';
 import { useLocalization } from '../../hooks/localization';
 import { UIIconCircle } from '../UIIconCircle';
@@ -13,7 +12,6 @@ import {
   AccountTitle,
   Amount,
   CategoryTitle,
-  Container,
   DateText,
   Description,
   Titles,

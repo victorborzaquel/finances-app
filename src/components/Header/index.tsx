@@ -1,9 +1,6 @@
 import React from 'react';
-import { BorderlessButton, BorderlessButtonProps } from 'react-native-gesture-handler';
 import { UIIcon } from '../../components/UIIcon';
 import {
-  IconAccountNameType,
-  IconCategoryNameType,
   IconInterfaceNameType,
   ThemeColorType
 } from '../../global/interfaces';
@@ -13,7 +10,6 @@ import {
   IconButton,
   Icons,
   Title,
-  Wrapper
 } from './styles';
 
 interface IIcon {

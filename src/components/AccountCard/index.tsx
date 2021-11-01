@@ -1,4 +1,3 @@
-import { IAccount } from '../../global/interfaces';
 import { useAuth } from '../../hooks/auth';
 import { RootSignInNavigationProps } from '../../routes/SignInRoutes';
 import { useNavigation } from '@react-navigation/native';
@@ -8,7 +7,6 @@ import { useLocalization } from '../../hooks/localization';
 import {
   AccountTitle,
   Amount,
-  Container,
   Description,
   Titles,
   Transaction,

@@ -6,7 +6,7 @@ import { ScrollView } from 'react-native';
 import { useTheme } from 'styled-components/native';
 import { VictoryPie } from 'victory-native';
 import ColorsData from '../../data/ColorsData';
-import { ICategory, TransactionType } from '../../global/interfaces';
+import { TransactionType } from '../../global/interfaces';
 import { ITotalBalance, ITotalByCategories } from '../../hooks/data';
 import { useLocalization } from '../../hooks/localization';
 
