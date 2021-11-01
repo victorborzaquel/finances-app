@@ -9,9 +9,11 @@
 **Expo:** https://expo.dev/@victorborzaquel/myfinances  
 **Play Store:** Em Breve  
 
-**Para usar o aplicativo com Expo é preciso baixar o app do Expo:**
-**Android:** https://play.google.com/store/apps/details?id=host.exp.exponent
-**Iphone:** https://apps.apple.com/br/app/expo-go/id982107779
+**OBS: Para usar o aplicativo com Expo é preciso baixar o app do Expo:**
+
+
+**Android:** https://play.google.com/store/apps/details?id=host.exp.exponent  
+**Iphone:** https://apps.apple.com/br/app/expo-go/id982107779  
 
 # Algumas Tecnologias utilizadas
 
