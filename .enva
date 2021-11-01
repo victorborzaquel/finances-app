@@ -1,0 +1,14 @@
+# Google Sign In
+CLIENT_ID=716852341409-odcev0plbip29c7s56hnh26mb6008m32.apps.googleusercontent.com
+REDIRECT_URI=https://auth.expo.io/@victorborzaquel/myfinances
+
+# Async Storage
+CURRENT_USER_ID_KEY=@myfinances_currentuserid
+USER_KEY=@myfinances_users
+TRANSACTIONS_KEY=@myfinances_transactions?user:
+TRANSFERS_KEY=@myfinances_utransfers?user:
+CREDIT_CARDS_KEY=@myfinances_credtcard?user:
+CREDIT_CARDS_TRANSACTIONS_KEY=@myfinances_credtcardtransactions?user:
+CATEGORIES_KEY=@myfinances_categories?user:
+ACCOUNTS_KEY=@myfinances_accounts?user:
+EXPENSES_LIMIT_KEY=@myfinances_expenseslimit?user:
