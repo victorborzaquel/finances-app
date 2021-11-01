@@ -82,6 +82,12 @@ export const ptBR_Dictionary = {
   'Logout': 'Sair da conta',
   'Delete account': 'Excluir conta',
 
+  // Settings
+  'Theme': 'Tema',
+  'Language': 'Lingua',
+  'Currency': 'Moeda',
+  'Default Account': 'Conta principal',
+
   // Month Modal
   'Current mother': 'Mês Atual',
   'Cancel': 'Cancelar',

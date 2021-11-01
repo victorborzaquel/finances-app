@@ -143,8 +143,12 @@ export function AddTransaction() {
     navigation.goBack()
   }
 
-  function isCurrentCategoryType() {
-    return !!category.id && category.type === transactionType
+  function isCurrentCategoryType(type?: TransactionType) {
+    if (!!category.id) {
+      return !!type
+        ? category.type === type
+        : category.type === transactionType
+    }
   }
 
   useEffect(() => {
@@ -207,7 +211,7 @@ export function AddTransaction() {
               icon="calendar"
             />
             <InputModal
-              title={isCurrentCategoryType() ? category.name : t(otherCategory[transactionType].name)}
+              title={isCurrentCategoryType('expense') ? category.name : t(otherCategory[transactionType].name)}
               setOpenModal={categoryModal.open}
               icon="folder"
             />
@@ -238,7 +242,7 @@ export function AddTransaction() {
               icon="calendar"
             />
             <InputModal
-              title={isCurrentCategoryType() ? category.name : t(otherCategory[transactionType].name)}
+              title={isCurrentCategoryType('income') ? category.name : t(otherCategory[transactionType].name)}
               setOpenModal={categoryModal.open}
               icon="folder"
             />
@@ -317,7 +321,7 @@ export function AddTransaction() {
         <ListSelect
           setState={setCategory}
           close={categoryModal.close}
-          data={categories}
+          data={categories.filter(category => category.type === transactionType)}
           type="category"
         />
       </Modalize>

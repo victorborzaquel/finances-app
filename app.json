@@ -3,7 +3,7 @@
     "name": "myfinances",
     "slug": "myfinances",
     "scheme": "myfinances",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -20,11 +20,11 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.grupokvb.myfinances",
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.0.1"
     },
     "android": {
       "package": "com.grupokvb.myfinances",
-      "versionCode": 1,
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#F2F3F5"

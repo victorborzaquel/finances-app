@@ -74,25 +74,25 @@ export function Settings() {
 
       <Inputs>
         <InputModal
-          title={'Tema: ' + themes.find(theme => theme.id === user.theme)?.name}
+          title={t('Theme') + ':  ' + themes.find(theme => theme.id === user.theme)?.name}
           color="title"
           setOpenModal={themeModal.open}
           icon="check-square"
         />
         <InputModal
-          title={'Lingua: ' + languages.find(language => language.id === user.language)?.name}
+          title={t('Language') + ':  ' + languages.find(language => language.id === user.language)?.name}
           color="title"
           setOpenModal={languageModal.open}
           icon="check-square"
         />
         <InputModal
-          title={'Moeda: ' + currencys.find(currency => currency.id === user.currency)?.name}
+          title={t('Currency') + ':  ' + currencys.find(currency => currency.id === user.currency)?.name}
           color="title"
           setOpenModal={currencyModal.open}
           icon="check-square"
         />
         <InputModal
-          title={'Conta principal: ' + accounts.find(account => account.id === user.default_account_id)?.name}
+          title={t('Default Account') + ':  ' + accounts.find(account => account.id === user.default_account_id)?.name}
           color="title"
           setOpenModal={accountModal.open}
           icon="check-square"

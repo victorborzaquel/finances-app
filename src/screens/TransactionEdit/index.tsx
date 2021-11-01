@@ -229,7 +229,7 @@ export function TransactionEdit() {
         <ListSelect
           setState={setCategory}
           close={categoryModal.close}
-          data={categories}
+          data={categories.filter(category => category.type === transactionType)}
           type="category"
         />
       </Modalize>

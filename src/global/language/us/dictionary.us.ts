@@ -82,6 +82,12 @@ export const us_Dictionary = {
   'Logout': 'Logout',
   'Delete account': 'Delete account',
 
+  // Settings
+  'Theme': 'Theme',
+  'Language': 'Language',
+  'Currency': 'Currency',
+  'Default Account': 'Default Account',
+
   // Month Modal
   'Current mother': 'Current Mother',
   'Cancel': 'Cancel',
