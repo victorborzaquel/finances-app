@@ -7,7 +7,7 @@
 # Como usar o aplicativo:
 
 **Expo:** https://expo.dev/@victorborzaquel/myfinances  
-**Play Store:** Em Breve  
+**Play Store:** https://play.google.com/store/apps/details?id=com.grupokvb.myfinances  
 
 **OBS: Para usar o aplicativo com Expo é preciso baixar o app do Expo:**
 
