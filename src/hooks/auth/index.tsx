@@ -378,6 +378,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
   async function signIn(type: 'google') {
     setAuthStorageLoaded(false)
+
     try {
       const loginResponse = await selectLoginMethod(type)
 
@@ -392,7 +393,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
       const user = await loadUserData(userId)
 
-      setAuthStorageLoaded(true) 
+      setAuthStorageLoaded(true)
       return setUser(user)
     } catch (error: any) {
       throw new Error(error)
@@ -401,6 +402,7 @@ function AuthProvider({ children }: { children: ReactNode }) {
 
   async function loadAuthStorageData() {
     setAuthStorageLoaded(false)
+    // console.log(CURRENT_USER_ID_KEY)
     try {
       const currentUserIdStorage = await AsyncStorage.getItem(CURRENT_USER_ID_KEY!)
 

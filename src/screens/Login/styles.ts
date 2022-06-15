@@ -52,13 +52,13 @@ export const Buttons = styled.View`
   padding:  ${({ theme }) => theme.display.padding_app}px;
 `;
 
-export const Button = styled(RectButton)<{loading: boolean}>`
+export const Button = styled(RectButton) <{ loading: boolean }>`
   height: ${({ theme }) => theme.display.button_height}px;
   background-color: ${({ theme }) => theme.colors.background_secondary};
   border-radius: ${({ theme }) => theme.display.border_radius}px;
   flex-direction: row;
   align-items: center;
-  opacity: ${({loading}) => loading ? 0.5 : 1};
+  opacity: ${({ loading }) => loading ? 0.5 : 1};
 `;
 
 export const ButtonLogoWrapper = styled.View`
@@ -78,9 +78,9 @@ export const ButtonTitle = styled.Text`
   font-size: ${({ theme }) => theme.fonts.size.medium}px;
 `;
 
-export const Loader = styled.View<{loading: boolean}>`
+export const Loader = styled.View<{ loading: boolean }>`
   flex: 1;
   align-items: center;
   justify-content: center;
-  display: ${({loading}) => loading ?  'flex' : 'none'};
+  display: ${({ loading }) => loading ? 'flex' : 'none'};
 `;

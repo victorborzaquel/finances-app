@@ -30,9 +30,10 @@ export function Login() {
     let isActive = true
     try {
       setLoading(true)
+      console.log('google')
       return await signIn('google')
     } catch (error: any) {
-      Alert.alert('Ops', 'Não foi possivel entrar com a conta google.')
+      Alert.alert('Ops', 'Não foi possível entrar com a conta google.')
       console.log('Erro ao entrar com a conta google: ' + error.message)
     } finally {
       if (isActive) {
