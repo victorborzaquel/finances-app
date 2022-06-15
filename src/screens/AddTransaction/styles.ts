@@ -1,5 +1,3 @@
-import { Animated } from "react-native";
-import { RectButton } from "react-native-gesture-handler";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
@@ -10,7 +8,7 @@ export const Container = styled.View`
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
-export const Header = styled.View<{color: ButtonType}>`
+export const Header = styled.View<{ color: ButtonType }>`
   width: 100%;
   height: ${getStatusBarHeight() + RFValue(200)}px;
   background-color: ${({ theme, color }) => theme.colors[color]};
@@ -50,7 +48,7 @@ export const Forms = styled.ScrollView.attrs({
 `;
 
 export const Form = styled.ScrollView`
-  width: ${({ theme })=> theme.display.window_width}px;
+  width: ${({ theme }) => theme.display.window_width}px;
   padding: 0 ${({ theme }) => theme.display.padding_app}px;
 `;
 

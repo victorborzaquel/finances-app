@@ -1,13 +1,9 @@
-import { FlatList } from "react-native";
-import { RectButton } from "react-native-gesture-handler";
 import styled from "styled-components/native";
-import { ITotalByCategory } from "../../hooks/data";
-
 
 export const Container = styled.ScrollView.attrs({
-  nestedScrollEnabled:true
+  nestedScrollEnabled: true
 })`
-  width: ${({ theme })=> theme.display.window_width}px;
+  width: ${({ theme }) => theme.display.window_width}px;
   padding: 0 ${({ theme }) => theme.display.padding_app}px;
 `;
 
@@ -22,16 +18,16 @@ export const Total = styled.Text`
   padding-bottom: 12px;
 `;
 
-export const Category = styled.View<{color: string}>`
+export const Category = styled.View<{ color: string }>`
   width: 100%;
   border-left-width: 10px;
-  border-left-color: ${({color}) => color};
-  border-radius: ${({theme}) => theme.display.border_radius}px;
+  border-left-color: ${({ color }) => color};
+  border-radius: ${({ theme }) => theme.display.border_radius}px;
   background-color: ${({ theme }) => theme.colors.background_secondary};
   margin-bottom: 7px;
 `;
 
-export const CategoryButton = styled(RectButton)`
+export const CategoryButton = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 })`
   flex: 1;
   flex-direction: row;
   justify-content: space-between;

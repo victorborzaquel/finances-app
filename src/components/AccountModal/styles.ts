@@ -1,9 +1,7 @@
 import { FlatList } from "react-native";
-import { BorderlessButton, RectButton } from "react-native-gesture-handler";
-import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
-import { IAccount, ICategory } from "../../global/interfaces";
+import { IAccount } from "../../global/interfaces";
 
 export const Container = styled.View`
   width: 100%;
@@ -23,18 +21,18 @@ export const Modal = styled.Modal.attrs({
 })``;
 
 export const Content = styled.View`
-  background-color: ${({theme}) => theme.colors.background_secondary};
-  top: ${({theme}) => (
-    theme.display.window_height 
+  background-color: ${({ theme }) => theme.colors.background_secondary};
+  top: ${({ theme }) => (
+    theme.display.window_height
     - (theme.display.button_height + RFValue(100) + theme.display.window_width)
   )}px;
-  height: ${({theme}) => (
+  height: ${({ theme }) => (
     theme.display.button_height + RFValue(100) + theme.display.window_width
 
   )}px;
   width: 100%;
-  border-top-right-radius: ${({theme}) => theme.display.padding_app}px;
-  border-top-left-radius: ${({theme}) => theme.display.padding_app}px;
+  border-top-right-radius: ${({ theme }) => theme.display.padding_app}px;
+  border-top-left-radius: ${({ theme }) => theme.display.padding_app}px;
   justify-content: space-between;
   
 `;
@@ -45,7 +43,7 @@ export const AccountList = styled(FlatList as new () => FlatList<IAccount>)`
 
 export const ItemSeparator = styled.View`
   /* width: 100%; */
-  background-color: ${({ theme}) => theme.colors.line};
+  background-color: ${({ theme }) => theme.colors.line};
   margin-left: ${({ theme }) => theme.display.padding_app}px;
   margin-right: ${({ theme }) => theme.display.padding_app * 2}px;
   height: 1px;

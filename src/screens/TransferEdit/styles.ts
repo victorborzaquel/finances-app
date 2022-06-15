@@ -1,4 +1,3 @@
-import { RectButton } from "react-native-gesture-handler";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
@@ -9,7 +8,7 @@ export const Container = styled.View`
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
-export const Header = styled.View<{color: ButtonType}>`
+export const Header = styled.View<{ color: ButtonType }>`
   width: 100%;
   height: ${getStatusBarHeight() + RFValue(165)}px;
   background-color: ${({ theme, color }) => theme.colors[color]};
@@ -34,7 +33,7 @@ align-items: flex-end;
 justify-content: flex-end;
 `;
 
-export const Transfer = styled(RectButton)`
+export const Transfer = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 })`
   width: 100%;
   flex-direction: row;
   align-items: center;
@@ -72,7 +71,7 @@ export const Amount = styled.Text.attrs({
 `;
 
 export const Form = styled.ScrollView`
-  width: ${({ theme })=> theme.display.window_width}px;
+  width: ${({ theme }) => theme.display.window_width}px;
   padding: 0 ${({ theme }) => theme.display.padding_app}px;
 `;
 

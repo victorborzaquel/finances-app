@@ -1,4 +1,3 @@
-import { RectButton } from "react-native-gesture-handler";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
@@ -52,7 +51,7 @@ export const Buttons = styled.View`
   padding:  ${({ theme }) => theme.display.padding_app}px;
 `;
 
-export const Button = styled(RectButton) <{ loading: boolean }>`
+export const Button = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 }) <{ loading: boolean }>`
   height: ${({ theme }) => theme.display.button_height}px;
   background-color: ${({ theme }) => theme.colors.background_secondary};
   border-radius: ${({ theme }) => theme.display.border_radius}px;

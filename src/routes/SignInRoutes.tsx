@@ -18,6 +18,7 @@ import { TabBarIcon, TabBarIconNameType } from '../components/TabBarIcon'
 import { RootTransactionsParamList, TransactionsRoutes } from './TransactionsRoutes'
 import { Charts } from '../screens/Charts'
 import { Goals } from '../screens/Goals'
+import { TouchableOpacity } from 'react-native'
 
 export type RootSignInParamList = {
   DashboardRoutes: NavigatorScreenParams<RootDashboardParamList>;
@@ -77,11 +78,11 @@ export function SignInRoutes() {
                 </TabBarBackground>
               </TabBarButton>
             ) : (
-              <BorderlessButton {...rest}>
+              <TouchableOpacity {...rest}>
                 <TabBarHeight>
                   {children}
                 </TabBarHeight>
-              </BorderlessButton>
+              </TouchableOpacity>
             ),
         })
       }}

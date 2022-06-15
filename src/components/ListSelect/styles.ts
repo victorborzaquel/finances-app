@@ -1,11 +1,10 @@
-import { RectButton } from "react-native-gesture-handler";
 import styled from "styled-components/native";
 
 export const Container = styled.View`
-  background-color: ${({theme}) => theme.colors.background_secondary};
+  background-color: ${({ theme }) => theme.colors.background_secondary};
   width: 100%;
-  border-top-right-radius: ${({theme}) => theme.display.border_radius}px;
-  border-top-left-radius: ${({theme}) => theme.display.border_radius}px;
+  border-top-right-radius: ${({ theme }) => theme.display.border_radius}px;
+  border-top-left-radius: ${({ theme }) => theme.display.border_radius}px;
 
   padding: ${({ theme }) => theme.display.padding_app}px 0;
 `;
@@ -13,7 +12,7 @@ export const Container = styled.View`
 export const Category = styled.View``;
 
 export const ItemSeparator = styled.View`
-  background-color: ${({ theme}) => theme.colors.line};
+  background-color: ${({ theme }) => theme.colors.line};
   margin-left: ${({ theme }) => theme.display.padding_app}px;
   margin-right: ${({ theme }) => theme.display.padding_app * 2}px;
   height: 1px;

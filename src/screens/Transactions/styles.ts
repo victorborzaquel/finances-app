@@ -1,22 +1,21 @@
 import { FlatList } from "react-native";
-import { BorderlessButton, RectButton } from "react-native-gesture-handler";
 import { getBottomSpace } from "react-native-iphone-x-helper";
 import styled from "styled-components/native";
 import { ITransaction, ITransfer, TransactionType } from "../../global/interfaces";
 
-export const Container = styled.View<{space: number}>`
+export const Container = styled.View<{ space: number }>`
   flex: 1;
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
-export const HeaderButton = styled(BorderlessButton)`
+export const HeaderButton = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 })`
   padding: 3px;
   justify-content: center;
   align-items: center;
 `;
 
-export const BalanceButton = styled(RectButton)<{align?: 'flex-end' | 'flex-start' | 'center'}>`
-  align-items: ${({align}) => align || 'flex-start'};
+export const BalanceButton = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 }) <{ align?: 'flex-end' | 'flex-start' | 'center' }>`
+  align-items: ${({ align }) => align || 'flex-start'};
   padding: 5px 0;
   width: 33%;
   justify-content: space-between;
@@ -55,7 +54,7 @@ export const BalanceWrapper = styled.View`
 export const TransactionAmount = styled.Text.attrs({
   adjustsFontSizeToFit: true,
   numberOfLines: 1
-})<{type: TransactionType}>`
+}) <{ type: TransactionType }>`
   color: ${({ theme, type }) => {
     switch (type) {
       case 'expense': return theme.colors.attention_dark
@@ -84,7 +83,7 @@ export const TransactionHeaderTitle = styled.Text`
   font-size: ${({ theme }) => theme.fonts.size.medium}px;
 `;
 
-export const Transaction = styled(RectButton)<{confirmed: boolean}>`
+export const Transaction = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 }) <{ confirmed: boolean }>`
   width: 100%;
   flex-direction: row;
   align-items: center;
@@ -117,7 +116,7 @@ export const AccountTitle = styled.Text`
   line-height: ${({ theme }) => theme.fonts.size.medium}px;
 `;
 
-export const Transfer = styled(RectButton)`
+export const Transfer = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 })`
   width: 100%;
   flex-direction: row;
   align-items: center;
@@ -137,7 +136,7 @@ export const TransferTitle = styled.Text`
   font-size: ${({ theme }) => theme.fonts.size.medium}px;
 `;
 
-export const Amount = styled.Text<{type: TransactionType}>`
+export const Amount = styled.Text<{ type: TransactionType }>`
   color: ${({ theme, type }) => {
     switch (type) {
       case 'income': return theme.colors.success_dark
@@ -145,7 +144,7 @@ export const Amount = styled.Text<{type: TransactionType}>`
       case 'transfer': return theme.colors.secondary_dark
       case 'credit-card': return theme.colors.title
       default: return theme.colors.title
-    }   
+    }
   }};
   font-family: ${({ theme }) => theme.fonts.family.subtitle};
   font-size: ${({ theme }) => theme.fonts.size.medium}px;

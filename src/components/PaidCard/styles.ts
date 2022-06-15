@@ -1,4 +1,3 @@
-import { RectButton } from "react-native-gesture-handler";
 import styled from "styled-components/native";
 import { TransactionType } from "../../global/interfaces";
 
@@ -10,7 +9,7 @@ export const Transaction = styled.View`
   flex: 1;
 `;
 
-export const TransactionButton = styled(RectButton)`
+export const TransactionButton = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 })`
   width: 100%;
   padding: ${({ theme }) => theme.display.padding_app / 2}px;
 `;
@@ -54,7 +53,7 @@ export const AccountTitle = styled.Text`
   line-height: ${({ theme }) => theme.fonts.size.medium}px;
 `;
 
-export const Amount = styled.Text<{type: TransactionType}>`
+export const Amount = styled.Text<{ type: TransactionType }>`
   color: ${({ theme, type }) => {
     switch (type) {
       case 'income': return theme.colors.success_dark
@@ -62,7 +61,7 @@ export const Amount = styled.Text<{type: TransactionType}>`
       case 'transfer': return theme.colors.secondary_dark
       case 'credit-card': return theme.colors.title
       default: return theme.colors.title
-    }   
+    }
   }};
   font-family: ${({ theme }) => theme.fonts.family.subtitle};
   font-size: ${({ theme }) => theme.fonts.size.medium}px;

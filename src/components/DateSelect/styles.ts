@@ -1,9 +1,8 @@
-import { BorderlessButton } from "react-native-gesture-handler";
 import styled from "styled-components/native";
 
 export const Container = styled.View`
   width: 100%;
-  height: ${({ theme })=> theme.display.button_height / 1.3}px;
+  height: ${({ theme }) => theme.display.button_height / 1.3}px;
   align-items: center;
   justify-content: center;
   background-color: ${({ theme }) => theme.colors.background_secondary};
@@ -16,7 +15,7 @@ export const Arrows = styled.View`
   padding: 0 ${({ theme }) => theme.display.padding_app * 2}px;
 `;
 
-export const ChangeDateButton = styled(BorderlessButton)`
+export const ChangeDateButton = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 })`
   
 `;
 

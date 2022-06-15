@@ -1,10 +1,9 @@
 import { FlatList } from "react-native";
-import { RectButton } from "react-native-gesture-handler";
 import { getBottomSpace } from "react-native-iphone-x-helper";
 import styled from "styled-components/native";
 import { ITransaction, TransactionType } from "../../global/interfaces";
 
-export const Container = styled.View<{space: number}>`
+export const Container = styled.View<{ space: number }>`
   flex: 1;
   background-color: ${({ theme }) => theme.colors.background};
 `;
@@ -40,7 +39,7 @@ export const BalanceWrapper = styled.View`
   /* padding: 10px 0; */
 `;
 
-export const TransactionAmount = styled.Text<{type: 'income' | 'expense'}>`
+export const TransactionAmount = styled.Text<{ type: 'income' | 'expense' }>`
   color: ${({ theme, type }) => type === 'income' ? theme.colors.success_dark : theme.colors.attention_dark};
   font-family: ${({ theme }) => theme.fonts.family.title};
   font-size: ${({ theme }) => theme.fonts.size.medium}px;
@@ -63,7 +62,7 @@ export const TransactionHeaderTitle = styled.Text`
   font-size: ${({ theme }) => theme.fonts.size.medium}px;
 `;
 
-export const Transaction = styled(RectButton)<{confirmed: boolean}>`
+export const Transaction = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 }) <{ confirmed: boolean }>`
   width: 100%;
   flex-direction: row;
   align-items: center;
@@ -96,7 +95,7 @@ export const AccountTitle = styled.Text`
   line-height: ${({ theme }) => theme.fonts.size.medium}px;
 `;
 
-export const Amount = styled.Text<{type: TransactionType}>`
+export const Amount = styled.Text<{ type: TransactionType }>`
   color: ${({ theme, type }) => {
     switch (type) {
       case 'income': return theme.colors.success_dark
@@ -104,7 +103,7 @@ export const Amount = styled.Text<{type: TransactionType}>`
       case 'transfer': return theme.colors.secondary_dark
       case 'credit-card': return theme.colors.title
       default: return theme.colors.title
-    }   
+    }
   }};
   font-family: ${({ theme }) => theme.fonts.family.subtitle};
   font-size: ${({ theme }) => theme.fonts.size.medium}px;
@@ -120,9 +119,9 @@ export const ChartsScroll = styled.ScrollView.attrs({
 `;
 
 export const Chart = styled.ScrollView.attrs({
-  nestedScrollEnabled:true
+  nestedScrollEnabled: true
 })`
-  width: ${({ theme })=> theme.display.window_width}px;
+  width: ${({ theme }) => theme.display.window_width}px;
   padding: 0 ${({ theme }) => theme.display.padding_app}px;
 `;
 
@@ -136,8 +135,8 @@ export const Total = styled.Text`
   font-size: ${({ theme }) => theme.fonts.size.largue}px;
 `;
 
-export const Line = styled.View<{color: string}>`
+export const Line = styled.View<{ color: string }>`
   height: 100%;
   width: 5px;
-  background-color: ${({color}) => color};
+  background-color: ${({ color }) => color};
 `;

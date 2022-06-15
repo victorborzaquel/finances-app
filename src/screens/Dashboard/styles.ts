@@ -1,4 +1,3 @@
-import { BorderlessButton, RectButton } from "react-native-gesture-handler";
 import { getStatusBarHeight } from "react-native-iphone-x-helper";
 import { RFValue } from "react-native-responsive-fontsize";
 import styled from "styled-components/native";
@@ -14,8 +13,8 @@ export const Wrapper = styled.View``;
 
 export const Header = styled.View`
   background-color: ${({ theme }) => theme.colors.main};
-  padding: ${({ theme })=> theme.display.padding_app}px;
-  padding-top: ${({ theme })=> theme.display.padding_app + getStatusBarHeight()}px;
+  padding: ${({ theme }) => theme.display.padding_app}px;
+  padding-top: ${({ theme }) => theme.display.padding_app + getStatusBarHeight()}px;
   padding-bottom: ${RFValue(100)}px;
   flex-direction: row;
   
@@ -56,19 +55,19 @@ export const UserName = styled.Text`
   font-family: ${({ theme }) => theme.fonts.family.title};
   font-size: ${({ theme }) => theme.fonts.size.largue}px;
   line-height: ${({ theme }) => theme.fonts.size.largue}px;
-`;  
+`;
 
-export const SettingButton = styled(RectButton)`
+export const SettingButton = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 })`
   background-color: ${({ theme }) => theme.colors.main_dark};
   height: ${RFValue(40)}px;
   width: ${RFValue(40)}px;
   align-items: center;
   justify-content: center;
-  border-radius: ${({ theme })=> theme.display.border_radius}px;
+  border-radius: ${({ theme }) => theme.display.border_radius}px;
 `;
 
 export const Content = styled.View`
-  padding: 0 ${({ theme })=> theme.display.padding_app}px;
+  padding: 0 ${({ theme }) => theme.display.padding_app}px;
   padding-bottom: ${RFValue(50)}px;
 `;
 
@@ -98,8 +97,8 @@ export const BalanceAmount = styled.Text`
   font-size: ${({ theme }) => theme.fonts.size.largue}px;
 `;
 
-export const IconEyeButton = styled(BorderlessButton)`
-  margin: 0 ${({ theme })=> theme.display.padding_app}px;
+export const IconEyeButton = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 })`
+  margin: 0 ${({ theme }) => theme.display.padding_app}px;
 `;
 
 export const TransactionsBalance = styled.View`
@@ -109,9 +108,9 @@ export const TransactionsBalance = styled.View`
   align-items: center;
 `;
 
-export const BalanceButton = styled(RectButton)``;
+export const BalanceButton = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 })``;
 
-export const TransactionAmount = styled.Text<{type: 'income' | 'expense'}>`
+export const TransactionAmount = styled.Text<{ type: 'income' | 'expense' }>`
   color: ${({ theme, type }) => type === 'income' ? theme.colors.success_dark : theme.colors.attention_dark};
   font-family: ${({ theme }) => theme.fonts.family.title};
   font-size: ${({ theme }) => theme.fonts.size.medium}px;

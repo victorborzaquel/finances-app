@@ -74,7 +74,7 @@ export function Login() {
           loading={loading}
           style={styles.shadow}
           onPress={handleSignInWithGoogle}
-          enabled={!loading}
+          disabled={loading}
         >
           <ButtonLogoWrapper>
             <ButtonLogo source={require('../../assets/googleLogo.png')} />

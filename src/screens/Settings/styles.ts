@@ -1,4 +1,3 @@
-import { RectButton } from "react-native-gesture-handler";
 import styled from "styled-components/native";
 
 export const Container = styled.View`
@@ -6,7 +5,7 @@ export const Container = styled.View`
   background-color: ${({ theme }) => theme.colors.background};
 `;
 
-export const GoBackHeader = styled(RectButton)`
+export const GoBackHeader = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 })`
   flex-direction: row;
   align-items: center;
   padding: ${({ theme }) => theme.display.padding_app}px;

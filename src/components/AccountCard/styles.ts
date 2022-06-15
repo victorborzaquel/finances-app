@@ -1,4 +1,4 @@
-import { RectButton } from "react-native-gesture-handler";
+
 import styled from "styled-components/native";
 import { TransactionType } from "../../global/interfaces";
 
@@ -10,7 +10,7 @@ export const Transaction = styled.View`
   flex: 1;
 `;
 
-export const TransactionButton = styled(RectButton)`
+export const TransactionButton = styled.TouchableOpacity.attrs({ activeOpacity: 0.6 })`
   width: 100%;
   padding: ${({ theme }) => theme.display.padding_app / 2}px;
 `;
